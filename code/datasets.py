@@ -210,7 +210,7 @@ def get_mnist_transform(train: bool, unlearning: bool, use_augmentation: bool, i
 
 class Mnist(MNIST):
     def __init__(self, root, train, unlearning, download, img_size=32, 
-                 indices=None, use_augmentation=True):
+                 indices=None, use_augmentation=True, identity_range=None):
         transform = get_mnist_transform(train, unlearning, use_augmentation, img_size)
         super().__init__(root=root, train=train, download=download, transform=transform)
         
