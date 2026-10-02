@@ -140,6 +140,9 @@ def get_data_root(dataset_name):
     if dataset_name == "PinsFaceRecognition":
         return "105_classes_pins_dataset"
     elif dataset_name == "MUCAC":
+        # Prefer local copy (faster I/O) if it exists
+        if os.path.exists("/content/MUCAC"):
+            return "/content/MUCAC"
         return "./data/MUCAC"
     return "./data"
 
@@ -258,9 +261,13 @@ def main():
         img_size = 128
 
     # Load datasets with configurable augmentation
+    # MUCAC: Use "train_all" to load full pool (190-4854) for consistent indexing with split file
+    mucac_identity_range = "train_all" if args.dataset == "MUCAC" else None
+    
     trainset = getattr(datasets, args.dataset)(
         root=root, download=True, train=True, unlearning=True, 
-        img_size=img_size, use_augmentation=use_augmentation
+        img_size=img_size, use_augmentation=use_augmentation,
+        identity_range=mucac_identity_range
     )
     validset = getattr(datasets, args.dataset)(
         root=root, download=True, train=False, unlearning=True, 
@@ -271,13 +278,16 @@ def main():
     validloader = DataLoader(validset, num_workers=4, batch_size=batch_size, shuffle=False)
 
     # Load forget/retain indices
+    # Cifar20 uses fine CIFAR-100 labels (0-99) in trainset.targets, not coarse labels (0-19)
+    num_classes_for_split = 100 if args.dataset == 'Cifar20' else args.classes
+    
     forget_indices, retain_indices = load_forget_retain_indices(
         trainset=trainset,
         dataset_name=args.dataset,
         seed=args.seed,
         forget_per_class=args.forget_per_class,
         csv_path=args.csv_path,
-        num_classes=args.classes
+        num_classes=num_classes_for_split
     )
     
     # Transfer percentage if specified
@@ -287,31 +297,34 @@ def main():
             forget_indices=forget_indices,
             retain_indices=retain_indices,
             percent_to_transfer=(args.ret_perc / 100),
-            num_classes=args.classes,
+            num_classes=num_classes_for_split,
             dataset_name=args.dataset,
         )
 
     # Create retain and forget sets (with augmentation for training)
+    # MUCAC: Use "train_all" to load full pool (190-4854) for consistent indexing
     retainset = getattr(datasets, args.dataset)(
         root=root, download=True, train=True, unlearning=False,
-        img_size=img_size, indices=retain_indices, use_augmentation=use_augmentation
+        img_size=img_size, indices=retain_indices, use_augmentation=use_augmentation,
+        identity_range=mucac_identity_range
     )
     forgetset = getattr(datasets, args.dataset)(
         root=root, download=True, train=True, unlearning=False,
-        img_size=img_size, indices=forget_indices, use_augmentation=use_augmentation
+        img_size=img_size, indices=forget_indices, use_augmentation=use_augmentation,
+        identity_range=mucac_identity_range
     )
 
     # Evaluation sets (no augmentation)
-    # FIXED: identity_range ensures MUCAC loads correct identity range even with unlearning=True
+    # MUCAC: Use "train_all" for consistent indexing with split file
     retainset_eval = getattr(datasets, args.dataset)(
         root=root, download=True, train=True, unlearning=True,
         img_size=img_size, indices=retain_indices, use_augmentation=use_augmentation,
-        identity_range="retain"  # FIXED: Force retain identities for MUCAC
+        identity_range=mucac_identity_range
     )
     forgetset_eval = getattr(datasets, args.dataset)(
         root=root, download=True, train=True, unlearning=True,
         img_size=img_size, indices=forget_indices, use_augmentation=use_augmentation,
-        identity_range="forget"  # FIXED: Force forget identities for MUCAC
+        identity_range=mucac_identity_range
     )
 
     retain_train_dl = DataLoader(retainset, batch_size=batch_size, shuffle=True)

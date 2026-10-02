@@ -315,6 +315,7 @@ class MUCAC(Dataset):
                 - "retain": Force identities 190-1969 (retain/train set)
                 - "forget": Force identities 1970-4854 (forget set)
                 - "test": Force identities 0-189 (test set)
+                - "train_all": Force identities 190-4854 (full training pool)
         """
         self.root = root
         self.train = train
@@ -345,11 +346,13 @@ class MUCAC(Dataset):
             load_retain = (identity_range == "retain")
             load_forget = (identity_range == "forget")
             load_test = (identity_range == "test")
+            load_train_all = (identity_range == "train_all")  # Full training pool (190-4854)
         else:
             # Backward compatible: use train/unlearning logic
             load_test = not train
             load_retain = train and not unlearning
             load_forget = train and unlearning
+            load_train_all = False
 
         # Select files based on identity range
         # FIXED: Use sorted() for deterministic ordering across platforms
@@ -364,7 +367,11 @@ class MUCAC(Dataset):
                 smiling = 0
 
             # Select based on identity range
-            if load_forget and self.train_max_identity <= identity < self.forget_max_identity:
+            if load_train_all and self.test_max_identity <= identity < self.forget_max_identity:
+                # Full training pool: identities 190-4854 (both retain and forget blocks)
+                self.image_paths.append(img_path)
+                self.labels.append(smiling)
+            elif load_forget and self.train_max_identity <= identity < self.forget_max_identity:
                 self.image_paths.append(img_path)
                 self.labels.append(smiling)
             elif load_retain and self.test_max_identity <= identity < self.train_max_identity:

@@ -20,6 +20,7 @@ from sklearn import linear_model, model_selection
 
 from unlearn import *
 from metrics import UnLearningScore, get_membership_attack_prob, get_membership_attack_prob_our, evaluate_mia_xgboost
+from metrics_mia import get_mia_lira, get_mia_quantile, get_mia_shadow
 from utils import *
 import ssd as ssd_
 import conf
@@ -121,7 +122,8 @@ def get_metric_scores(
     forget_valid_dl_original,
   device,
   dataset_name,
-  model_name
+  model_name,
+  attack_type="standard",
 ):
     get_size_dl("Valid (Test) Dl: ", valid_dl)
     get_size_dl("Train Dl: ", train_dl)
@@ -138,10 +140,37 @@ def get_metric_scores(
     mia = 0
     
     # FIXED: Use *_original loaders (no augmentation) for MIA
-    mia_forget_retain = get_membership_attack_prob_our(retain_train_dl_original, forget_train_dl_original, model)  # FIXED
-    mia_forget_test = get_membership_attack_prob_our(valid_dl, forget_train_dl_original, model)  # FIXED
-    mia_retain_test = get_membership_attack_prob_our(retain_train_dl_original, valid_dl, model)  # FIXED
-    mia_train_test = get_membership_attack_prob_our(valid_dl, train_dl, model)
+    # Support multiple MIA attack types
+    if attack_type == "xgboost":
+        print(f"Running XGBoost MIA attack...")
+        mia_forget_retain = evaluate_mia_xgboost(retain_train_dl_original, forget_train_dl_original, model)
+        mia_forget_test = evaluate_mia_xgboost(valid_dl, forget_train_dl_original, model)
+        mia_retain_test = evaluate_mia_xgboost(retain_train_dl_original, valid_dl, model)
+        mia_train_test = evaluate_mia_xgboost(valid_dl, train_dl, model)
+    elif attack_type == "lira":
+        print(f"Running LiRA MIA attack...")
+        mia_forget_retain = get_mia_lira(retain_train_dl_original, forget_train_dl_original, model, device, "forget_retain")
+        mia_forget_test = get_mia_lira(valid_dl, forget_train_dl_original, model, device, "forget_test")
+        mia_retain_test = get_mia_lira(retain_train_dl_original, valid_dl, model, device, "retain_test")
+        mia_train_test = get_mia_lira(valid_dl, train_dl, model, device, "train_test")
+    elif attack_type == "quantile":
+        print(f"Running Quantile MIA attack...")
+        mia_forget_retain = get_mia_quantile(retain_train_dl_original, forget_train_dl_original, model, device, "forget_retain")
+        mia_forget_test = get_mia_quantile(valid_dl, forget_train_dl_original, model, device, "forget_test")
+        mia_retain_test = get_mia_quantile(retain_train_dl_original, valid_dl, model, device, "retain_test")
+        mia_train_test = get_mia_quantile(valid_dl, train_dl, model, device, "train_test")
+    elif attack_type == "shadow":
+        print(f"Running Shadow MIA attack...")
+        mia_forget_retain = get_mia_shadow(retain_train_dl_original, forget_train_dl_original, model, device, "forget_retain")
+        mia_forget_test = get_mia_shadow(valid_dl, forget_train_dl_original, model, device, "forget_test")
+        mia_retain_test = get_mia_shadow(retain_train_dl_original, valid_dl, model, device, "retain_test")
+        mia_train_test = get_mia_shadow(valid_dl, train_dl, model, device, "train_test")
+    else:  # standard
+        print(f"Running Standard MIA attack...")
+        mia_forget_retain = get_membership_attack_prob_our(retain_train_dl_original, forget_train_dl_original, model)
+        mia_forget_test = get_membership_attack_prob_our(valid_dl, forget_train_dl_original, model)
+        mia_retain_test = get_membership_attack_prob_our(retain_train_dl_original, valid_dl, model)
+        mia_train_test = get_membership_attack_prob_our(valid_dl, train_dl, model)
     
 
     return (loss_acc_dict["Acc"], retain_acc_dict["Acc"], zrf, mia, mia_forget_retain, mia_forget_test, mia_retain_test, mia_train_test, d_f["Acc"]) 
@@ -168,6 +197,7 @@ def baseline(
     device,
     **kwargs,
 ):
+    attack_type = kwargs.get("attack_type", "standard")
     return get_metric_scores(
         model,
         unlearning_teacher,
@@ -184,7 +214,8 @@ def baseline(
       forget_valid_dl_original,
         device,
       dataset_name,
-  model_name
+      model_name,
+      attack_type=attack_type,
     )
 
 def retrain(
@@ -261,8 +292,15 @@ def retrain(
         warm_epochs = kwargs.get("warm", 1)
         lr = kwargs.get("lr", 0.1)
 
-        # Get training schedule
-        if model_name == "ViT":
+        # Get training schedule - support overrides for underfitted/overfitted experiments
+        epochs_override = kwargs.get("epochs_override", None)
+        milestones_override = kwargs.get("milestones_override", None)
+        
+        if epochs_override is not None:
+            EPOCHS = epochs_override
+            MILESTONES = milestones_override if milestones_override else [epochs_override]
+            print(f"Using override epochs={EPOCHS}, milestones={MILESTONES}")
+        elif model_name == "ViT":
             EPOCHS = getattr(conf, f"{dataset_name}_{model_name}_EPOCHS")
             MILESTONES = getattr(conf, f"{dataset_name}_{model_name}_MILESTONES")
         else:
@@ -351,6 +389,7 @@ def retrain(
                 best_acc = acc
 
     # Final metrics - FIXED: pass net instead of model
+    attack_type = kwargs.get("attack_type", "standard")
     return get_metric_scores(
         net,  # FIXED: was incorrectly passing `model` (baseline)
         unlearning_teacher,
@@ -367,7 +406,8 @@ def retrain(
       forget_valid_dl_original,
         device,
       dataset_name,
-  model_name
+      model_name,
+      attack_type=attack_type,
     )
 
 
@@ -416,6 +456,7 @@ def finetune(
         5, model, retain_train_dl, valid_dl, lr=0.02, device=device
     )
 
+    attack_type = kwargs.get("attack_type", "standard")
     return get_metric_scores(
         model,
         unlearning_teacher,
@@ -431,7 +472,8 @@ def finetune(
     forget_valid_dl_original,
         device,
       dataset_name,
-  model_name
+      model_name,
+      attack_type=attack_type,
     )
 
 
@@ -481,6 +523,7 @@ def teacher(
         KL_temperature=KL_temperature,
     )
 
+    attack_type = kwargs.get("attack_type", "standard")
     return get_metric_scores(
         student_model,
         unlearning_teacher,
@@ -496,7 +539,8 @@ def teacher(
     forget_valid_dl_original,
         device,
       dataset_name,
-  model_name
+      model_name,
+      attack_type=attack_type,
     )
 
     
@@ -543,6 +587,7 @@ def amnesiac(
     _ = fit_one_unlearning_cycle(
         3, model, unlearning_train_set_dl, valid_dl, device=device, lr=0.0001
     )
+    attack_type = kwargs.get("attack_type", "standard")
     return get_metric_scores(
         model,
         unlearning_teacher,
@@ -558,7 +603,8 @@ def amnesiac(
     forget_valid_dl_original,
         device,
       dataset_name,
-  model_name
+      model_name,
+      attack_type=attack_type,
     )
 
 
@@ -641,6 +687,7 @@ def FisherForgetting(
         mu, var = get_mean_var(p, False, alpha=alpha)
         p.data = mu + var.sqrt() * torch.empty_like(p.data0).normal_()
         fisher_dir.append(var.sqrt().view(-1).cpu().detach().numpy())
+    attack_type = kwargs.get("attack_type", "standard")
     return get_metric_scores(
         model,
         unlearning_teacher,
@@ -656,7 +703,8 @@ def FisherForgetting(
     forget_valid_dl_original,
         device,
       dataset_name,
-  model_name
+      model_name,
+      attack_type=attack_type,
     )
 
 
@@ -703,6 +751,7 @@ def ssdtuning(
     original_importances = ssd.calc_importance(full_train_dl)
     ssd.modify_weight(original_importances, sample_importances)
     
+    attack_type = kwargs.get("attack_type", "standard")
     return get_metric_scores(
         ssd.model,
         unlearning_teacher,
@@ -718,5 +767,6 @@ def ssdtuning(
     forget_valid_dl_original,
         device,
       dataset_name,
-  model_name
+      model_name,
+      attack_type=attack_type,
     )

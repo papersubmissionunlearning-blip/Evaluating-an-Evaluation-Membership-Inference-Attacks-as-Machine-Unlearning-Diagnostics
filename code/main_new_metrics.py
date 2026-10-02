@@ -192,6 +192,21 @@ def main():
     parser.add_argument("-retrain_folder", type=str, default=None,
                         help="Path to folder containing pre-trained retrain models")
     
+    # Augmentation control (for overfitted experiments)
+    parser.add_argument("-no_augmentation", action="store_true", default=False,
+                        help="Disable data augmentation (for overfitted experiments)")
+    
+    # Epochs override (for underfitted experiments)
+    parser.add_argument("-epochs_override", type=int, default=None,
+                        help="Override default epochs (for underfitted experiments)")
+    parser.add_argument("-milestones_override", type=str, default=None,
+                        help="Override milestones as comma-separated values, e.g., '8,12,16'")
+    
+    # MIA attack type
+    parser.add_argument("-attack", type=str, default="standard",
+                        choices=["standard", "xgboost", "lira", "quantile", "shadow"],
+                        help="MIA attack type to use")
+    
     # Output
     parser.add_argument("-output_dir", type=str, default=None,
                         help="Directory to save results")
@@ -199,6 +214,11 @@ def main():
                         help="Output filename (optional)")
     
     args = parser.parse_args()
+    
+    # Parse milestones if provided
+    milestones_override = None
+    if args.milestones_override:
+        milestones_override = [int(x) for x in args.milestones_override.split(',')]
 
     # Set seeds
     torch.manual_seed(args.seed)
@@ -207,11 +227,16 @@ def main():
     
     device = "cuda" if args.gpu and torch.cuda.is_available() else "cpu"
     batch_size = args.b
+    
+    # Determine augmentation setting
+    use_augmentation = not args.no_augmentation
 
     print("=" * 60)
     print(f"Running: {args.net} + {args.dataset}")
     print(f"Method: {args.method} | Seed: {args.seed} | ret_perc: {args.ret_perc}")
-    print(f"Device: {device}")
+    print(f"Device: {device} | Augmentation: {use_augmentation} | Attack: {args.attack}")
+    if args.epochs_override:
+        print(f"Epochs override: {args.epochs_override}")
     print("=" * 60)
 
     # Load model
@@ -233,24 +258,33 @@ def main():
         img_size = 128
 
     # Load full datasets
+    # MUCAC: Use "train_all" to load full pool (190-4854) for consistent indexing with split file
+    mucac_identity_range = "train_all" if args.dataset == "MUCAC" else None
+    
     trainset = getattr(datasets, args.dataset)(
-        root=root, download=True, train=True, unlearning=True, img_size=img_size
+        root=root, download=True, train=True, unlearning=True, img_size=img_size,
+        use_augmentation=use_augmentation,
+        identity_range=mucac_identity_range
     )
     validset = getattr(datasets, args.dataset)(
-        root=root, download=True, train=False, unlearning=True, img_size=img_size
+        root=root, download=True, train=False, unlearning=True, img_size=img_size,
+        use_augmentation=use_augmentation
     )
 
     trainloader = DataLoader(trainset, num_workers=4, batch_size=batch_size, shuffle=True)
     validloader = DataLoader(validset, num_workers=4, batch_size=batch_size, shuffle=False)
 
     # Load forget/retain indices
+    # Cifar20 uses fine CIFAR-100 labels (0-99) in trainset.targets, not coarse labels (0-19)
+    num_classes_for_split = 100 if args.dataset == 'Cifar20' else args.classes
+    
     forget_indices, retain_indices = load_forget_retain_indices(
         trainset=trainset,
         dataset_name=args.dataset,
         seed=args.seed,
         forget_per_class=args.forget_per_class,
         csv_path=args.csv_path,
-        num_classes=args.classes
+        num_classes=num_classes_for_split
     )
 
     # Transfer percentage if specified
@@ -260,31 +294,38 @@ def main():
             forget_indices=forget_indices,
             retain_indices=retain_indices,
             percent_to_transfer=(args.ret_perc / 100),
-            num_classes=args.classes,
+            num_classes=num_classes_for_split,
             dataset_name=args.dataset,
         )
 
     # Create retain and forget sets with training transforms (unlearning=False)
+    # MUCAC: Use "train_all" to load full pool (190-4854) for consistent indexing
     retainset = getattr(datasets, args.dataset)(
         root=root, download=True, train=True, unlearning=False,
-        img_size=img_size, indices=retain_indices
+        img_size=img_size, indices=retain_indices,
+        use_augmentation=use_augmentation,
+        identity_range=mucac_identity_range
     )
     forgetset = getattr(datasets, args.dataset)(
         root=root, download=True, train=True, unlearning=False,
-        img_size=img_size, indices=forget_indices
+        img_size=img_size, indices=forget_indices,
+        use_augmentation=use_augmentation,
+        identity_range=mucac_identity_range
     )
 
     # Create retain and forget sets with evaluation transforms (unlearning=True)
-    # FIXED: identity_range ensures MUCAC loads correct identity range even with unlearning=True
+    # MUCAC: Use "train_all" for consistent indexing with split file
     retainset_eval = getattr(datasets, args.dataset)(
         root=root, download=True, train=True, unlearning=True,
         img_size=img_size, indices=retain_indices,
-        identity_range="retain"  # FIXED: Force retain identities for MUCAC
+        use_augmentation=use_augmentation,
+        identity_range=mucac_identity_range
     )
     forgetset_eval = getattr(datasets, args.dataset)(
         root=root, download=True, train=True, unlearning=True,
         img_size=img_size, indices=forget_indices,
-        identity_range="forget"  # FIXED: Force forget identities for MUCAC
+        use_augmentation=use_augmentation,
+        identity_range=mucac_identity_range
     )
 
     # Training dataloaders
@@ -341,6 +382,14 @@ def main():
     # Add retrain_folder if specified
     if args.retrain_folder:
         kwargs["retrain_folder"] = args.retrain_folder
+    
+    # Add attack_type for MIA
+    kwargs["attack_type"] = args.attack
+    
+    # Add epochs override if specified
+    if args.epochs_override is not None:
+        kwargs["epochs_override"] = args.epochs_override
+        kwargs["milestones_override"] = milestones_override
 
     # Start time tracking
     start = time.time()

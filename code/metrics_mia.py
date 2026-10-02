@@ -26,6 +26,12 @@ from sklearn.metrics import roc_curve, auc
 from quantile.model import *
 from quantile.quantile_attack import *
 
+# LiRA imports
+from lira.lira import estimate_loss_distributions, run_over_MIA as run_over_MIA_lira
+
+# Shadow attack imports
+from shadow_attack.shadow_attack import run_over_MIA as run_over_MIA_shadow
+
 
 def entropy(p, dim=-1, keepdim=False):
     return -torch.where(p > 0, p * p.log(), p.new([0.0])).sum(dim=dim, keepdim=keepdim)
@@ -158,6 +164,10 @@ def get_mia_quantile(
     alpha=0.05,
 ):
     """Run quantile-based MIA and return only AUC (float)."""
+
+    # Clean up old index files for this title
+    for name in (f"original_indices_{title}", f"original_indices_test_{title}"):
+        Path(name).unlink(missing_ok=True)
 
     # ---- Collect tensors from loaders ----
     train_images, train_labels = [], []
@@ -365,7 +375,7 @@ def get_mia_lira(
     )
 
     # attack zone: compute MIA scores for measurement samples (uses your helper)
-    scores = run_over_MIA(
+    scores = run_over_MIA_lira(
         target_model,
         measurement_images,
         measurement_labels,
@@ -462,7 +472,7 @@ def get_mia_shadow(
         print(f"Members (train): {len(measurement_train_images)}, Non-members (test): {len(measurement_test_images)}")
 
     # ------------------- Run Membership Inference Attack -------------------
-    scores = run_over_MIA(
+    scores = run_over_MIA_shadow(
         target_model,
         measurement_images,
         shadow_images,

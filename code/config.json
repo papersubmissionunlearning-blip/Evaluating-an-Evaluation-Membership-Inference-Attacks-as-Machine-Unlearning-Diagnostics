@@ -142,24 +142,7 @@
             "lr": 0.1,
             "milestones": [7]
         },
-        {
-            "name": "ViT_Cifar20",
-            "model": "ViT",
-            "dataset": "Cifar20",
-            "num_classes": 20,
-            "epochs_baseline": 9,
-            "epochs_retrain": 9,
-            "use_augmentation": true,
-            "forget_per_class": 50,
-            "baseline_path": "Base Models/ViT-Cifar20-9-best.pth",
-            "retrain_folder": "Retrain Models/ViT Cifar 20",
-            "split_csv": "splits/split_indices_Cifar20.csv",
-            "img_size": 224,
-            "batch_size": 128,
-            "lr": 0.1,
-            "milestones": [8]
-        },
-        {
+                {
             "name": "ResNet18_Cifar10_Underfitted",
             "model": "ResNet18",
             "dataset": "Cifar10",
@@ -249,8 +232,33 @@
             "split_csv": "splits/split_indices_Cifar10.csv",
             "forget_per_class": 500,
             "img_size": 32,
-            "attacks": ["lira", "quantile", "shadow"]
+            "attacks": ["xgboost", "lira", "quantile", "shadow"]
         }
+    ],
+    
+    "dualoptim_experiments": [
+        {
+            "name": "ResNet18_Cifar10",
+            "model": "ResNet18",
+            "dataset": "Cifar10",
+            "num_classes": 10,
+            "use_augmentation": true,
+            "forget_per_class": 500,
+            "baseline_path": "Base Models/ResNet18-Cifar10-20-best.pth",
+            "split_csv": "splits/split_indices_Cifar10.csv",
+            "img_size": 32,
+            "batch_size": 128,
+            "note": "name matches the standard experiment so results land in Results_ResNet18_Cifar10 next to the existing methods. batch_size is 128 (DualOptim paper Appendix B.1) rather than the 256 used elsewhere."
+        }
+    ],
+    
+    "dualoptim_method_configs": [
+        {"name": "scrub",    "method": "scrub",    "ret_perc": 0},
+        {"name": "salun",    "method": "salun",    "ret_perc": 0},
+        {"name": "sfron",    "method": "sfron",    "ret_perc": 0},
+        {"name": "scrub_do", "method": "scrub_do", "ret_perc": 0},
+        {"name": "salun_do", "method": "salun_do", "ret_perc": 0},
+        {"name": "sfron_do", "method": "sfron_do", "ret_perc": 0}
     ],
     
     "methods": ["baseline", "retrain", "finetune", "teacher", "amnesiac", "ssdtuning"],

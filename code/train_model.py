@@ -230,9 +230,13 @@ else:
 img_size = 224 if args.net == "ViT" else 128  # ORIGINAL: 128 for all except ViT
 
 # Load datasets - pass use_augmentation parameter
+# MUCAC: Use "train_all" to load full pool (190-4854) for baseline training
+mucac_identity_range = "train_all" if args.dataset == "MUCAC" else None
+
 trainset = getattr(datasets, args.dataset)(
     root=root, download=True, train=True, unlearning=False, img_size=img_size,
-    use_augmentation=use_augmentation
+    use_augmentation=use_augmentation,
+    identity_range=mucac_identity_range
 )
 testset = getattr(datasets, args.dataset)(
     root=root, download=True, train=False, unlearning=False, img_size=img_size,
@@ -265,6 +269,39 @@ else:
     checkpoint_path = os.path.join(checkpoint_path, "{net}-{dataset}-{epoch}-{type}.pth")
     use_custom_path = False
 
+# Setup logging to txt file
+class TeeOutput:
+    """Writes to both stdout and a log file."""
+    def __init__(self, log_path, stdout):
+        self.log_file = open(log_path, 'w')
+        self.stdout = stdout
+    
+    def write(self, message):
+        self.stdout.write(message)
+        self.log_file.write(message)
+        self.log_file.flush()
+    
+    def flush(self):
+        self.stdout.flush()
+        self.log_file.flush()
+    
+    def close(self):
+        self.log_file.close()
+
+# Determine log file path (same location as checkpoint, with .txt extension)
+if use_custom_path:
+    log_path = checkpoint_path.replace('.pth', '.txt')
+else:
+    log_dir = os.path.dirname(checkpoint_path.format(net=args.net, dataset=args.dataset, epoch=1, type="best"))
+    log_path = os.path.join(log_dir, f"{args.net}-{args.dataset}-training.txt")
+
+# Create TeeOutput to log to both console and file
+original_stdout = sys.stdout
+sys.stdout = TeeOutput(log_path, original_stdout)
+print(f"Logging training to: {log_path}")
+print(f"Train set size: {len(trainset)} samples")
+print(f"Test set size: {len(testset)} samples")
+
 best_acc = 0.0
 for epoch in range(1, EPOCHS + 1):
     if epoch > args.warm:
@@ -288,3 +325,9 @@ for epoch in range(1, EPOCHS + 1):
 print("=" * 60)
 print(f"Training complete. Best accuracy: {best_acc:.4f}")
 print("=" * 60)
+
+# Close log file and restore stdout
+if hasattr(sys.stdout, 'close'):
+    sys.stdout.close()
+sys.stdout = original_stdout
+print(f"Training log saved to: {log_path}")
