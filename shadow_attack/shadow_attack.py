@@ -127,12 +127,12 @@ def shadow_zone(shadow_imgs, shadow_labs, num_shadow_models=2, epochs=100, lr=0.
         in_features.append(get_confidences_shadow_model(model_in, shadow_imgs1, shadow_labs1, device))
         out_features.append(get_confidences_shadow_model(model_in, shadow_imgs2, shadow_labs2, device))
 
-        # model_out
+        # model_out (trained on shadow_imgs2, so shadow_imgs2 is IN, shadow_imgs1 is OUT)
         model_out = ShadowModel().to(device)
-        model_out = ensure_feature_method(model_out)   # <-- add
+        model_out = ensure_feature_method(model_out)
         model_out = train_model_with_raw_tensors(model_out, shadow_imgs2, shadow_labs2, epochs, lr, device=device)
-        in_features.append(get_confidences_shadow_model(model_out, shadow_imgs1, shadow_labs1, device))
-        out_features.append(get_confidences_shadow_model(model_out, shadow_imgs2, shadow_labs2, device))
+        in_features.append(get_confidences_shadow_model(model_out, shadow_imgs2, shadow_labs2, device))
+        out_features.append(get_confidences_shadow_model(model_out, shadow_imgs1, shadow_labs1, device))
 
     in_features = torch.cat(in_features)
     out_features = torch.cat(out_features)
