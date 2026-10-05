@@ -236,6 +236,65 @@ def attack_zone(target_data,
 
 
 
+def train_attack_classifier(in_features,
+                            out_features,
+                            num_epochs: int,
+                            lr: float,
+                            attack_hidden_size: int,
+                            device: str = 'cuda') -> nn.Module:
+    """
+    Train the attack classifier on shadow model logits.
+
+    Same training phase as attack_zone, but without a target sample: the
+    classifier depends only on the shadow features, so one fit serves the
+    whole measurement set.
+    """
+
+    # ---------- Prepare dataset ----------
+    X = torch.cat([in_features, out_features])        # shape [N, num_classes]
+    y = torch.tensor(
+        [1] * len(in_features) + [0] * len(out_features),
+        dtype=torch.float32
+    ).unsqueeze(1)
+
+    dataset = TensorDataset(X, y)
+    train_loader = DataLoader(dataset, batch_size=128, shuffle=True)
+
+    D = X.shape[-1]
+
+    # ---------- Attack classifier ----------
+    classifier = nn.Sequential(
+        nn.Linear(D, attack_hidden_size),
+        nn.ReLU(),
+        nn.Linear(attack_hidden_size, 1),
+        nn.Sigmoid()
+    ).to(device)
+
+    criterion = nn.BCELoss()
+    optimizer = optim.Adam(classifier.parameters(), lr=lr)
+
+    # ---------- Train ----------
+    classifier.train()
+    for epoch in range(num_epochs):
+        total_loss = 0.0
+        for feats, lbls in train_loader:
+            feats = feats.to(device)
+            lbls = lbls.to(device)
+            optimizer.zero_grad()
+            preds = classifier(feats)
+            loss = criterion(preds, lbls)
+            loss.backward()
+            optimizer.step()
+            total_loss += loss.item()
+        if epoch % 10 == 0 or epoch == num_epochs - 1:
+            print(f"[Attack] Epoch {epoch+1}/{num_epochs} "
+                  f"Loss: {total_loss/len(train_loader):.4f}")
+
+    return classifier
+
+
+
+
 def membership_inference(target_model, target_data, shadow_images, shadow_labels, num_shadow_models=2, shadow_epochs=100, shadow_lr=0.01,  attack_epochs=100, attack_lr=1e-3, attack_hidden_size=100, device='cuda'):
     in_features, out_features = shadow_zone(shadow_images, shadow_labels, num_shadow_models, shadow_epochs, shadow_lr, device)
     score = attack_zone(target_data, target_model, in_features, out_features, attack_epochs, attack_lr, attack_hidden_size, device)
@@ -244,9 +303,17 @@ def membership_inference(target_model, target_data, shadow_images, shadow_labels
 
 
 def run_over_MIA(target_model, target_data_col, shadow_images, shadow_labels, num_shadow_models=2, shadow_epochs=100, shadow_lr=0.01,  attack_epochs=100, attack_lr=1e-3, attack_hidden_size=100, device='cuda'):
+    # Neither the shadow pool nor the attack classifier depends on the sample
+    # being scored, so both are fit once here. Fitting them per sample also put
+    # every score on its own scale, which breaks the AUC's cross-sample ranking.
+    in_features, out_features = shadow_zone(shadow_images, shadow_labels, num_shadow_models, shadow_epochs, shadow_lr, device)
+    classifier = train_attack_classifier(in_features, out_features, attack_epochs, attack_lr, attack_hidden_size, device)
+
+    target_model.eval()
+    classifier.eval()
     result_col=[]
-    for i in range(len(target_data_col)):
-        target_data=target_data_col[i]
-        result=membership_inference(target_model, target_data, shadow_images, shadow_labels, num_shadow_models, shadow_epochs, shadow_lr,  attack_epochs, attack_lr, attack_hidden_size, device)
-        result_col.append(result)
+    with torch.no_grad():
+        for i in range(len(target_data_col)):
+            target_feature = target_model(target_data_col[i].unsqueeze(0).to(device))
+            result_col.append(classifier(target_feature).item())
     return np.array(result_col)
