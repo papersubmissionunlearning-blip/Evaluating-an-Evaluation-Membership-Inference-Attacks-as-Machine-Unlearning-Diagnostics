@@ -546,11 +546,12 @@ def amnesiac(
         rnd = random.choice(unlearninglabels)
         while rnd == clabel:
             rnd = random.choice(unlearninglabels)
-        unlearning_trainset.append((x, _, rnd))
+        unlearning_trainset.append((x, _, torch.tensor(rnd, dtype=torch.long)))
+
 
     for x, _, y in retain_train_dl.dataset:
         if kwargs.get("dataset_name", "Cifar10") == "MUCAC": 
-            unlearning_trainset.append((x, _, torch.tensor(rnd)))
+            unlearning_trainset.append((x, _, y))
         else:
             unlearning_trainset.append((x, _, y))
 
