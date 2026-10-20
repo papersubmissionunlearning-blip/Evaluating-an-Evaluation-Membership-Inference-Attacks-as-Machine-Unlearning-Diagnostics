@@ -1,9 +1,5 @@
 """
 Calculate MIAU (Membership Inference Attack Unlearning) scores per seed.
-
-FIXED:
-- compute_fi now returns 1.0 when B==R (ideal case) instead of 0
-- This correctly scores an ideal unlearning method at ~99.9 instead of ~66.6
 """
 
 import pandas as pd
@@ -16,9 +12,8 @@ def compute_fi(B, R, M):
     """
     Compute f_i score for MIA metric.
     
-    FIXED: When B == R (baseline equals retrain), the method achieves ideal
-    unlearning behavior. In this case, we should return 1.0 (perfect score)
-    not 0 (which would incorrectly penalize perfect unlearning).
+    When B == R (baseline equals retrain) and M == R, the method achieves ideal
+    unlearning behavior, so the score is 1.0 (perfect score).
     
     Args:
         B: Baseline MIA score
@@ -32,7 +27,7 @@ def compute_fi(B, R, M):
     if denom < 1e-9:  # B approximately equals R
         # If M is also close to R, this is ideal unlearning
         if abs(M - R) < 1e-9:
-            return 1.0  # FIXED: Return 1.0 for ideal case
+            return 1.0  # ideal case
         else:
             # M differs from R even though B==R, which is unusual
             # Return negative to indicate method is worse than ideal

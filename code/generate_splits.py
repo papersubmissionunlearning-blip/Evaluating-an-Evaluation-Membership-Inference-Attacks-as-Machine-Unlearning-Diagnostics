@@ -10,7 +10,7 @@ def generate_and_save_balanced_split(trainset, dataset_name, forget_per_class, n
     Columns: index, label, split, seed, dataset, forget_per_class
     """
     all_rows = []
-    # FIXED: Handle both .targets (CIFAR) and .labels (MUCAC) attributes
+    # Handle both .targets (CIFAR) and .labels (MUCAC) attributes
     if hasattr(trainset, 'targets'):
         targets = np.array(trainset.targets)
     elif hasattr(trainset, 'labels'):

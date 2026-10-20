@@ -71,8 +71,7 @@
             "batch_size": 256,
             "lr": 0.1,
             "milestones": [10, 20],
-            "needs_baseline_train": true,
-            "note": "MUCAC split was inverted - baseline and retrain models need retraining with fixed code"
+            "needs_baseline_train": true
         },
         {
             "name": "AllCNN_Cifar10",

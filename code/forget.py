@@ -2,10 +2,7 @@
 Code adapted from https://github.com/if-loops/selective-synaptic-dampening/tree/main/src
 https://arxiv.org/abs/2308.07707
 
-FIXED:
-- retrain() now passes the newly trained `net` to get_metric_scores instead of original `model`
-- Added support for epochs_override and milestones_override for underfitted/overfitted experiments
-- retrain() now loads pre-existing retrain models from disk if available (instead of training from scratch)
+
 """
 from torch.utils.data import Subset, DataLoader, ConcatDataset
 import random
@@ -131,19 +128,15 @@ def get_metric_scores(
     get_size_dl("Retain Valid Dl (original): ", retain_valid_dl_original)
     get_size_dl("Forget Valid Dl (original): ", forget_valid_dl_original)
 
-    # FIXED: Use *_original loaders (no augmentation) for evaluation metrics
-    # This ensures consistent evaluation without random augmentation artifacts
     loss_acc_dict = evaluate(model, valid_dl, device)
-    retain_acc_dict = evaluate(model, retain_valid_dl_original, device)  # FIXED: was retain_valid_dl
-    zrf = UnLearningScore(model, unlearning_teacher, forget_valid_dl_original, 128, device)  # FIXED: was forget_valid_dl
-    d_f = evaluate(model, forget_valid_dl_original, device)  # FIXED: was forget_valid_dl
+    retain_acc_dict = evaluate(model, retain_valid_dl_original, device)  
+    zrf = UnLearningScore(model, unlearning_teacher, forget_valid_dl_original, 128, device)  
+    d_f = evaluate(model, forget_valid_dl_original, device)  
     mia = 0
     
-    # FIXED: Use *_original loaders (no augmentation) for MIA
-    # Augmented data causes artificially high MIA scores due to distribution shift
-    mia_forget_retain = get_membership_attack_prob_our(retain_train_dl_original, forget_train_dl_original, model)  # FIXED
-    mia_forget_test = get_membership_attack_prob_our(valid_dl, forget_train_dl_original, model)  # FIXED
-    mia_retain_test = get_membership_attack_prob_our(retain_train_dl_original, valid_dl, model)  # FIXED
+    mia_forget_retain = get_membership_attack_prob_our(retain_train_dl_original, forget_train_dl_original, model)  
+    mia_forget_test = get_membership_attack_prob_our(valid_dl, forget_train_dl_original, model) 
+    mia_retain_test = get_membership_attack_prob_our(retain_train_dl_original, valid_dl, model)  
     mia_train_test = get_membership_attack_prob_our(valid_dl, train_dl, model)  # train_dl is used for reference only
     
 
@@ -368,9 +361,8 @@ def retrain(
                 best_acc = acc
 
     # Final metrics
-    # FIXED: Pass the newly trained/loaded model `net` instead of original `model`
     return get_metric_scores(
-        net,  # FIXED: was incorrectly passing `model` (baseline)
+        net,  
         unlearning_teacher,
         train_dl,
         retain_train_dl,

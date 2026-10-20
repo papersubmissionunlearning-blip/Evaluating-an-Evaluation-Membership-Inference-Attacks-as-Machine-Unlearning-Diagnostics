@@ -3,11 +3,10 @@ From https://github.com/vikram2000b/bad-teaching-unlearning / https://arxiv.org/
 Code adapted from https://github.com/if-loops/selective-synaptic-dampening/tree/main/src
 https://arxiv.org/abs/2308.07707
 
-FIXED:
-- LiRA label inversion: train samples now correctly labeled as 1 (members), test as 0 (non-members)
-- perc parameter: default changed from 0.0 to 0.2 to ensure shadow models have training data
-- Consistent index file naming with title suffix
-- Random sampling instead of truncation for balanced sets
+- Train samples are labelled 1 (members), test samples 0 (non-members)
+- perc defaults to 0.2 so the shadow models have training data
+- Index files are named with the title suffix
+- Sets are balanced by random subsampling rather than truncation
 """
 import torch.nn as nn
 from torch.nn import functional as F
@@ -69,7 +68,7 @@ def get_membership_attack_data(retain_loader, forget_loader, test_loader, model)
 
     min_size = min(len(retain_prob), len(test_prob))
     
-    # FIXED: Use random sampling instead of simple truncation
+    # Balance the sets by random subsampling
     seed = len(retain_prob) * 1000 + len(test_prob)
     retain_prob = _random_subsample(retain_prob, min_size, seed)
     test_prob = _random_subsample(test_prob, min_size, seed + 1)
@@ -109,7 +108,7 @@ def get_membership_attack_data_our(loaderSet1, loaderSet2, model):
 
     min_size = min(len(prob_set1), len(prob_set2))
     
-    # FIXED: Use random sampling
+    # Balance the sets by random subsampling
     seed = len(prob_set1) * 1000 + len(prob_set2)
     prob_set1 = _random_subsample(prob_set1, min_size, seed)
     prob_set2 = _random_subsample(prob_set2, min_size, seed + 1)
@@ -124,7 +123,7 @@ def get_membership_attack_data_our(loaderSet1, loaderSet2, model):
 
 
 def get_membership_attack_prob_our(loaderSet1, loaderSet2, model, seed=None):
-    """FIXED: Added seed parameter for varying random_state."""
+    """If seed is None, derives it from the data."""
     X, Y = get_membership_attack_data_our(loaderSet1, loaderSet2, model)
 
     if seed is None:
@@ -149,9 +148,9 @@ def get_mia_quantile(
     model,
     device,
     title,
-    perc=0.2,  # FIXED: Changed from 0.0 to 0.2
+    perc=0.2,  # must be > 0 so the shadow models have training data
     perc_test=0.20,
-    measurement_number=100,  # FIXED: Increased from 10 to 100 for better AUC estimation
+    measurement_number=100,  # enough measurement samples for a stable AUC estimate
     auxillary_bs=32,
     n_quantile=100,
     low_quantile=0.01,
@@ -184,7 +183,7 @@ def get_mia_quantile(
     test_images = torch.cat(test_images)
     test_labels = torch.cat(test_labels)
 
-    # ---- Create deterministic index files per run (FIXED: consistent naming) ----
+    # ---- Create deterministic index files per run ----
     idx_path_train = Path(f"original_indices_{title}")
     if not idx_path_train.exists():
         original_indices = torch.randperm(len(train_images))
@@ -227,7 +226,7 @@ def get_mia_quantile(
     measurement_images = torch.cat([measurement_train_images, measurement_test_images])
     measurement_labels = torch.cat([measurement_train_labels, measurement_test_labels])
     
-    # FIXED: Correct labels - train samples are members (1), test samples are non-members (0)
+    # Train samples are members (1), test samples are non-members (0)
     measurement_ref = np.array([1]*len(measurement_train_images) + [0]*len(measurement_test_images))
 
     aux_dataset = TensorDataset(shadow_images, shadow_labels)
@@ -272,9 +271,9 @@ def get_mia_lira(
     output_size=10,
     epochs=50,
     lr=1e-3,
-    perc=0.2,  # FIXED: Changed from 0.0 to 0.2
+    perc=0.2,  # must be > 0 so the shadow models have training data
     perc_test=0.20,
-    measurement_number=100,  # FIXED: Increased from 10 to 100 for better AUC estimation
+    measurement_number=100,  # enough measurement samples for a stable AUC estimate
     num_shadow_models=10,
     lr_shadow_model=1e-3,
     epochs_shadow_model=20,
@@ -306,7 +305,7 @@ def get_mia_lira(
     train_images = torch.cat(train_images)
     train_labels = torch.cat(train_labels)
 
-    # FIXED: Consistent index file naming with title
+    # Index file is named with the title suffix
     idx_path = f'original_indices_{title}'
     if not os.path.exists(idx_path):
         original_indices = torch.randperm(len(train_images))
@@ -331,7 +330,7 @@ def get_mia_lira(
     test_images = torch.cat(test_images)
     test_labels = torch.cat(test_labels)
 
-    # FIXED: Consistent index file naming with title
+    # Index file is named with the title suffix
     idx_path_test = f'original_indices_test_{title}'
     if not os.path.exists(idx_path_test):
         original_indices_test = torch.randperm(len(test_images))
@@ -355,8 +354,7 @@ def get_mia_lira(
     measurement_images = torch.cat([measurement_train_images, measurement_test_images])
     measurement_labels = torch.cat([measurement_train_labels, measurement_test_labels])
     
-    # FIXED: Correct labels - train samples are members (1), test samples are non-members (0)
-    # Original code had this inverted: [0]*train + [1]*test which is WRONG
+    # Train samples are members (1), test samples are non-members (0)
     measurement_ref = np.array([1] * len(measurement_train_images) + [0] * len(measurement_test_images))
 
     print(f"Measurement Sample Size: {len(measurement_images)}")
@@ -397,10 +395,10 @@ def get_mia_shadow(
     loader2,                    # DataLoader (e.g., testing set)
     target_model,               # The model to attack
     device,                     # torch.device("cuda" or "cpu")
-    title="shadow",             # FIXED: Added title parameter
-    perc=0.2,                   # FIXED: Changed from 0.0 to 0.2
+    title="shadow",             # suffix for the index file names
+    perc=0.2,                   # must be > 0 so the shadow models have training data
     perc_test=0.2,
-    measurement_number=100,  # FIXED: Increased from 20 to 100 for better AUC estimation
+    measurement_number=100,  # enough measurement samples for a stable AUC estimate
     num_shadow_models=5,
     shadow_epochs=30,
     shadow_lr=1e-3,
@@ -437,7 +435,7 @@ def get_mia_shadow(
     train_images, train_labels = gather_images_labels(loader1)
     test_images, test_labels = gather_images_labels(loader2)
 
-    # ------------------- Fix indices for reproducibility (FIXED: consistent naming) -------------------
+    # ------------------- Fix indices for reproducibility -------------------
     def get_indices(filename, total_len):
         if not os.path.exists(filename):
             idx = torch.randperm(total_len)
@@ -464,7 +462,7 @@ def get_mia_shadow(
     shadow_labels = torch.cat([attacker_train_labels, attacker_test_labels])
     measurement_images = torch.cat([measurement_train_images, measurement_test_images])
     
-    # FIXED: Correct labels - train samples are members (1), test samples are non-members (0)
+    # Train samples are members (1), test samples are non-members (0)
     measurement_ref = np.array([1] * len(measurement_train_images) + [0] * len(measurement_test_images))
 
     if verbose:
@@ -538,7 +536,7 @@ def get_mia_data_saliency(loaderSet1, loaderSet2, model):
 
     min_size = min(len(saliency_set1), len(saliency_set2))
     
-    # FIXED: Use random sampling
+    # Balance the sets by random subsampling
     seed = len(saliency_set1) * 1000 + len(saliency_set2)
     rng = np.random.RandomState(seed % (2**31))
     

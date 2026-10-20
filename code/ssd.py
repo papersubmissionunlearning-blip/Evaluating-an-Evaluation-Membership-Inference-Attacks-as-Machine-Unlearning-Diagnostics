@@ -1,6 +1,9 @@
 """
 This file is used for the Selective Synaptic Dampening method
 Strategy files use the methods from here
+
+From https://github.com/if-loops/selective-synaptic-dampening/tree/main/src
+https://arxiv.org/abs/2308.07707
 """
 
 import torch

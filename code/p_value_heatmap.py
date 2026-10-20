@@ -46,7 +46,7 @@ def csv_paths(folders, csv_name):
 # (output name, files, figure width in inches)
 variants = [
     ("figure_p_value_heatmap",
-     csv_paths(standard_folders, "compiled_results_MIAU.csv"), 3), #2.64  6
+     csv_paths(standard_folders, "compiled_results_MIAU.csv"), 3),
     ("figure_p_value_heatmap_nongeneralized",
      csv_paths(nongeneralized_folders, "compiled_results_MIAU.csv"), 5.5),
     ("figure_p_value_heatmap_0.5_alpha",

@@ -2,10 +2,8 @@
 Code adapted from https://github.com/if-loops/selective-synaptic-dampening/tree/main/src
 https://arxiv.org/abs/2308.07707
 
-FIXED: 
-- Added use_augmentation parameter to control augmentation independently
-- Fixed list mutation bug (now copies lists before appending)
-- Fixed MUCAC split inversion
+- use_augmentation controls augmentation independently of the unlearning flag
+- Transform lists are copied before appending, so the templates are never mutated
 """
 
 from typing import Any, Tuple
@@ -23,7 +21,7 @@ CIFAR_MEAN = (0.5070751592371323, 0.48654887331495095, 0.4409178433670343)
 CIFAR_STD = (0.2673342858792401, 0.2564384629170883, 0.27615047132568404)
 
 # Cropping etc. to improve performance of the model (details see https://github.com/weiaicunzai/pytorch-cifar100)
-# NOTE: These are now templates - ALWAYS copy before modifying!
+# NOTE: These are templates - ALWAYS copy before modifying!
 _transform_train_from_scratch = [
     transforms.RandomCrop(32, padding=4),
     transforms.RandomHorizontalFlip(),
@@ -288,14 +286,14 @@ def load_mucac_meta(path):
 
 class MUCAC(Dataset):
     """
-    MUCAC Dataset with FIXED split logic and decoupled transform/identity selection.
+    MUCAC Dataset with identity-based splits and decoupled transform/identity selection.
     
     Identity ranges:
     - Test: identities 0-189
     - Train/Retain: identities 190-1969
     - Forget: identities 1970-4854
     
-    FIXED: The `unlearning` parameter now ONLY controls transforms (no augmentation when True).
+    The `unlearning` parameter ONLY controls transforms (no augmentation when True).
     Identity range selection is controlled by `identity_range` parameter, or defaults to
     backward-compatible train/unlearning logic when not specified.
     """
@@ -340,7 +338,7 @@ class MUCAC(Dataset):
         self.transform = get_mucac_transform(train, unlearning, use_augmentation)
 
         # Determine which identity range to load
-        # FIXED: identity_range parameter allows decoupling from unlearning flag
+        # identity_range decouples identity selection from the unlearning flag
         if identity_range is not None:
             # Explicit override for evaluation loaders
             load_retain = (identity_range == "retain")
@@ -355,7 +353,7 @@ class MUCAC(Dataset):
             load_train_all = False
 
         # Select files based on identity range
-        # FIXED: Use sorted() for deterministic ordering across platforms
+        # sorted() gives deterministic ordering across platforms
         self.image_paths = []
         self.labels = []
 

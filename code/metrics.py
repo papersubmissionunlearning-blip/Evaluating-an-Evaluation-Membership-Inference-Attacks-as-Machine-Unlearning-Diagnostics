@@ -3,9 +3,8 @@ From https://github.com/vikram2000b/bad-teaching-unlearning / https://arxiv.org/
 Code adapted from https://github.com/if-loops/selective-synaptic-dampening/tree/main/src
 https://arxiv.org/abs/2308.07707
 
-FIXED:
-- Fixed class-biased truncation: now uses proper random sampling instead of [:min_size]
-- Fixed hardcoded random_state=42: now derives seed from data hash for reproducibility with variation
+Sets are balanced by random subsampling (not truncation), and the attack's
+random_state is derived from the data so it varies across runs while staying reproducible.
 """
 import torch.nn as nn
 from torch.nn import functional as F
@@ -46,7 +45,6 @@ def entropy(p, dim=-1, keepdim=False):
 
 
 def collect_prob(data_loader, model):
-    # FIXED: Changed batch_size from 1 to 128 for much faster inference
     data_loader = torch.utils.data.DataLoader(
         data_loader.dataset, batch_size=128, shuffle=False
     )
@@ -63,7 +61,7 @@ def collect_prob(data_loader, model):
 def _random_subsample(tensor, target_size, seed):
     """
     Randomly subsample a tensor to target_size using the given seed.
-    FIXED: Replaces simple truncation [:min_size] which caused class bias.
+    Truncating to [:min_size] instead would bias the subset by class order.
     """
     if len(tensor) <= target_size:
         return tensor
@@ -77,7 +75,6 @@ def _random_subsample(tensor, target_size, seed):
 def _get_data_seed(tensor1, tensor2):
     """
     Derive a seed from the data tensors for reproducible but varying random states.
-    FIXED: Replaces hardcoded random_state=42.
     """
     # Use hash of tensor shapes and first few values for seed
     seed_val = len(tensor1) * 1000 + len(tensor2)
@@ -94,7 +91,7 @@ def get_membership_attack_data(retain_loader, forget_loader, test_loader, model)
 
     min_size = min(len(retain_prob), len(test_prob))
     
-    # FIXED: Use random sampling instead of simple truncation
+    # Balance the sets by random subsampling
     seed = _get_data_seed(retain_prob, test_prob)
     retain_prob = _random_subsample(retain_prob, min_size, seed)
     test_prob = _random_subsample(test_prob, min_size, seed + 1)
@@ -135,7 +132,7 @@ def get_membership_attack_data_our(loaderSet1, loaderSet2, model):
 
     min_size = min(len(prob_set1), len(prob_set2))
     
-    # FIXED: Use random sampling instead of simple truncation
+    # Balance the sets by random subsampling
     seed = _get_data_seed(prob_set1, prob_set2)
     prob_set1 = _random_subsample(prob_set1, min_size, seed)
     prob_set2 = _random_subsample(prob_set2, min_size, seed + 1)
@@ -151,12 +148,10 @@ def get_membership_attack_data_our(loaderSet1, loaderSet2, model):
 
 def get_membership_attack_prob_our(loaderSet1, loaderSet2, model, seed=None):
     """
-    FIXED: Added seed parameter for varying random_state instead of hardcoded 42.
     If seed is None, derives it from the data.
     """
     X, Y = get_membership_attack_data_our(loaderSet1, loaderSet2, model)
 
-    # FIXED: Use varying random_state instead of hardcoded 42
     if seed is None:
         seed = int(np.sum(X[:10]) * 1000) % (2**31) if len(X) > 0 else 42
     
@@ -217,7 +212,7 @@ def get_mia_data_saliency(loaderSet1, loaderSet2, model):
 
     min_size = min(len(saliency_set1), len(saliency_set2))
     
-    # FIXED: Use random sampling instead of simple truncation
+    # Balance the sets by random subsampling
     seed = len(saliency_set1) * 1000 + len(saliency_set2)
     rng = np.random.RandomState(seed % (2**31))
     
@@ -240,11 +235,10 @@ def get_mia_data_saliency(loaderSet1, loaderSet2, model):
 def evaluate_mia_xgboost(loaderSet1, loaderSet2, model, seed=None):
     """
     Trains an XGBoost classifier to differentiate between saliency maps.
-    FIXED: Added seed parameter for varying random_state.
+    If seed is None, derives it from the data.
     """
     X, Y = get_mia_data_saliency(loaderSet1, loaderSet2, model)
 
-    # FIXED: Use varying random_state
     if seed is None:
         seed = int(np.sum(X[:10, :10]) * 100) % (2**31) if len(X) > 0 else 42
     

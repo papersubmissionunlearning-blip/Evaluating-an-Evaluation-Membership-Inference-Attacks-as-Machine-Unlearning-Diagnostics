@@ -1,5 +1,8 @@
 """
-FIXED: retrain() now loads pre-existing retrain models from disk if available
+Code adapted from https://github.com/if-loops/selective-synaptic-dampening/tree/main/src
+https://arxiv.org/abs/2308.07707
+
+retrain() loads a pre-existing retrain model from disk if one is available.
 """
 import random
 import numpy as np
@@ -52,78 +55,6 @@ from collections import Counter
 
 def get_size_dl(name, dl):
     print(name, str(len(dl.dataset)))
-
-# def get_classwise_ds(ds, num_classes):
-#     classwise_ds = {i: [] for i in range(num_classes)}
-#     for img, label, clabel in ds:
-#         classwise_ds[clabel].append((img, label, clabel))
-#     return classwise_ds
-
-
-# def build_retain_forget_sets(
-#     classwise_train,
-#     classwise_test,
-#     num_classes,
-#     forget_class,
-#     percent_to_transfer: int = 0,  # e.g., 0, 25, 100
-# ):
-#     """
-#     Build retain/forget splits. All non-forget classes go to RETAIN.
-#     For the 'forget_class', transfer the FIRST k% (sequentially) of its samples to RETAIN,
-#     and keep the remaining (100 - k)% in FORGET.
-
-#     Examples:
-#       - percent_to_transfer=0   -> 0% moved; 100% stay in FORGET.
-#       - percent_to_transfer=25  -> first 25% moved to RETAIN; 75% stay in FORGET.
-#       - percent_to_transfer=100 -> all moved to RETAIN; FORGET gets 0.
-#     """
-#     # clamp to [0, 100]
-#     p = max(0, min(int(percent_to_transfer), 100))
-
-#     def split_sequential(samples):
-#         n = len(samples)
-#         k = int(round((p / 100.0) * n))
-#         k = max(0, min(k, n))
-#         to_transfer = samples[:k]   # FIRST k% go to RETAIN
-#         to_forget   = samples[k:]   # remaining stay in FORGET
-#         return to_transfer, to_forget
-
-#     # VALID
-#     forget_valid, retain_valid = [], []
-#     for cls in range(num_classes):
-#         samples = classwise_test[cls]
-#         if cls == forget_class:
-#             to_transfer, to_forget = split_sequential(samples)
-#             retain_valid.extend(to_transfer)
-#             forget_valid.extend(to_forget)
-#         else:
-#             retain_valid.extend(samples)
-
-#     # TRAIN
-#     forget_train, retain_train = [], []
-#     for cls in range(num_classes):
-#         samples = classwise_train[cls]
-#         if cls == forget_class:
-#             to_transfer, to_forget = split_sequential(samples)
-#             retain_train.extend(to_transfer)
-#             forget_train.extend(to_forget)
-#         else:
-#             retain_train.extend(samples)
-
-#     # ---- class distributions print ----
-#     def count_classes(data):
-#         cnt = Counter()
-#         for _, _, clabel in data:
-#             cnt[clabel] += 1
-#         return [cnt.get(c, 0) for c in range(num_classes)]
-
-#     print("\nClass distributions (counts per class):")
-#     print("Retain TRAIN :", count_classes(retain_train))
-#     print("Retain VALID :", count_classes(retain_valid))
-#     print("Forget TRAIN :", count_classes(forget_train))
-#     print("Forget VALID :", count_classes(forget_valid))
-
-#     return (retain_train, retain_valid, forget_train, forget_valid)
 
 # Create datasets of the classes
 def get_classwise_ds(ds, num_classes):
@@ -233,49 +164,6 @@ def build_retain_forget_sets(
         forget_valid_idx,
     )
   
-# def build_retain_forget_sets(
-#     classwise_train, classwise_test, num_classes, forget_class
-# ):
-#     # Getting the forget and retain validation data
-#     forget_valid = []
-#     for cls in range(num_classes):
-#         if cls == forget_class:
-#             for img, label, clabel in classwise_test[cls]:
-#                 forget_valid.append((img, label, clabel))
-
-#     retain_valid = []
-#     for cls in range(num_classes):
-#         if cls != forget_class:
-#             for img, label, clabel in classwise_test[cls]:
-#                 retain_valid.append((img, label, clabel))
-
-#     forget_train = []
-#     for cls in range(num_classes):
-#         if cls == forget_class:
-#             for img, label, clabel in classwise_train[cls]:
-#                 forget_train.append((img, label, clabel))
-
-#     retain_train = []
-#     for cls in range(num_classes):
-#         if cls != forget_class:
-#             for img, label, clabel in classwise_train[cls]:
-#                 retain_train.append((img, label, clabel))
-
-#     # ---- NEW: print class distributions ----
-#     def count_classes(data):
-#         cnt = Counter()
-#         for _, _, clabel in data:
-#             cnt[clabel] += 1
-#         return [cnt.get(c, 0) for c in range(num_classes)]
-
-#     print("\nClass distributions")
-#     print("Retain TRAIN :", count_classes(retain_train))
-#     print("Retain VALID :", count_classes(retain_valid))
-#     print("Forget TRAIN :", count_classes(forget_train))
-#     print("Forget VALID :", count_classes(forget_valid))
-
-#     return (retain_train, retain_valid, forget_train, forget_valid)
-
 
 
 from collections import Counter
@@ -295,7 +183,7 @@ def get_metric_scores(
     forget_valid_dl,
     valid_dl,
     device,
-    # FIXED: Add original (non-augmented) loaders for evaluation
+    # Original (non-augmented) loaders for evaluation
     retain_train_dl_original=None,
     retain_valid_dl_original=None,
     forget_train_dl_original=None,
@@ -314,17 +202,17 @@ def get_metric_scores(
     get_size_dl("Retain Valid Dl (eval): ", retain_eval)
     get_size_dl("Forget Valid Dl (eval): ", forget_eval)
 
-    # FIXED: Use non-augmented loaders for evaluation metrics
+    # Use non-augmented loaders for evaluation metrics
     loss_acc_dict = evaluate(model, valid_dl, device)
-    retain_acc_dict = evaluate(model, retain_eval, device)  # FIXED
-    zrf = UnLearningScore(model, unlearning_teacher, forget_eval, 128, device)  # FIXED
-    d_f = evaluate(model, forget_eval, device)  # FIXED
-    mia = get_membership_attack_prob(retain_mia, forget_mia, valid_dl, model)  # FIXED
+    retain_acc_dict = evaluate(model, retain_eval, device)
+    zrf = UnLearningScore(model, unlearning_teacher, forget_eval, 128, device)
+    d_f = evaluate(model, forget_eval, device)
+    mia = get_membership_attack_prob(retain_mia, forget_mia, valid_dl, model)
     
-    # FIXED: Use non-augmented loaders for MIA
-    mia_forget_retain = get_membership_attack_prob_our(retain_mia, forget_mia, model)  # FIXED
-    mia_forget_test = get_membership_attack_prob_our(valid_dl, forget_mia, model)  # FIXED
-    mia_retain_test = get_membership_attack_prob_our(retain_mia, valid_dl, model)  # FIXED
+    # Use non-augmented loaders for MIA
+    mia_forget_retain = get_membership_attack_prob_our(retain_mia, forget_mia, model)
+    mia_forget_test = get_membership_attack_prob_our(valid_dl, forget_mia, model)
+    mia_retain_test = get_membership_attack_prob_our(retain_mia, valid_dl, model)
     mia_train_test = get_membership_attack_prob_our(valid_dl, train_dl, model)
 
     return (loss_acc_dict["Acc"], retain_acc_dict["Acc"], zrf, mia, mia_forget_retain, mia_forget_test, mia_retain_test, mia_train_test, d_f["Acc"]) 
@@ -354,7 +242,7 @@ def baseline(
         forget_valid_dl,
         valid_dl,
         device,
-        # FIXED: Pass original loaders from kwargs
+        # Pass original (non-augmented) loaders from kwargs
         retain_train_dl_original=kwargs.get("retain_train_dl_original"),
         retain_valid_dl_original=kwargs.get("retain_valid_dl_original"),
         forget_train_dl_original=kwargs.get("forget_train_dl_original"),
@@ -531,7 +419,7 @@ def retrain(
         forget_valid_dl,
         valid_dl,
         device,
-        # FIXED: Pass original loaders from kwargs
+        # Pass original (non-augmented) loaders from kwargs
         retain_train_dl_original=kwargs.get("retain_train_dl_original"),
         retain_valid_dl_original=kwargs.get("retain_valid_dl_original"),
         forget_train_dl_original=kwargs.get("forget_train_dl_original"),
@@ -566,7 +454,7 @@ def finetune(
         forget_valid_dl,
         valid_dl,
         device,
-        # FIXED: Pass original loaders from kwargs
+        # Pass original (non-augmented) loaders from kwargs
         retain_train_dl_original=kwargs.get("retain_train_dl_original"),
         retain_valid_dl_original=kwargs.get("retain_valid_dl_original"),
         forget_train_dl_original=kwargs.get("forget_train_dl_original"),
@@ -621,7 +509,7 @@ def teacher(
         forget_valid_dl,
         valid_dl,
         device,
-        # FIXED: Pass original loaders from kwargs
+        # Pass original (non-augmented) loaders from kwargs
         retain_train_dl_original=kwargs.get("retain_train_dl_original"),
         retain_valid_dl_original=kwargs.get("retain_valid_dl_original"),
         forget_train_dl_original=kwargs.get("forget_train_dl_original"),
@@ -673,7 +561,7 @@ def amnesiac(
         forget_valid_dl,
         valid_dl,
         device,
-        # FIXED: Pass original loaders from kwargs
+        # Pass original (non-augmented) loaders from kwargs
         retain_train_dl_original=kwargs.get("retain_train_dl_original"),
         retain_valid_dl_original=kwargs.get("retain_valid_dl_original"),
         forget_train_dl_original=kwargs.get("forget_train_dl_original"),
@@ -885,7 +773,7 @@ def NTK(
         forget_valid_dl,
         valid_dl,
         device,
-        # FIXED: Pass original loaders from kwargs
+        # Pass original (non-augmented) loaders from kwargs
         retain_train_dl_original=kwargs.get("retain_train_dl_original"),
         retain_valid_dl_original=kwargs.get("retain_valid_dl_original"),
         forget_train_dl_original=kwargs.get("forget_train_dl_original"),
@@ -981,7 +869,7 @@ def FisherForgetting(
         forget_valid_dl,
         valid_dl,
         device,
-        # FIXED: Pass original loaders from kwargs
+        # Pass original (non-augmented) loaders from kwargs
         retain_train_dl_original=kwargs.get("retain_train_dl_original"),
         retain_valid_dl_original=kwargs.get("retain_valid_dl_original"),
         forget_train_dl_original=kwargs.get("forget_train_dl_original"),
@@ -1060,7 +948,7 @@ def UNSIR(
         forget_valid_dl,
         valid_dl,
         device,
-        # FIXED: Pass original loaders from kwargs
+        # Pass original (non-augmented) loaders from kwargs
         retain_train_dl_original=kwargs.get("retain_train_dl_original"),
         retain_valid_dl_original=kwargs.get("retain_valid_dl_original"),
         forget_train_dl_original=kwargs.get("forget_train_dl_original"),
@@ -1114,7 +1002,7 @@ def ssdtuning(
         forget_valid_dl,
         valid_dl,
         device,
-        # FIXED: Pass original loaders from kwargs
+        # Pass original (non-augmented) loaders from kwargs
         retain_train_dl_original=kwargs.get("retain_train_dl_original"),
         retain_valid_dl_original=kwargs.get("retain_valid_dl_original"),
         forget_train_dl_original=kwargs.get("forget_train_dl_original"),

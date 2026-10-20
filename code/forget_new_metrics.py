@@ -2,9 +2,7 @@
 Code adapted from https://github.com/if-loops/selective-synaptic-dampening/tree/main/src
 https://arxiv.org/abs/2308.07707
 
-FIXED:
-- retrain() now loads pre-existing retrain models from disk if available
-- retrain() now passes the correct model to get_metric_scores
+retrain() loads a pre-existing retrain model from disk if one is available.
 """
 from torch.utils.data import Subset, DataLoader, ConcatDataset
 import random
@@ -132,14 +130,14 @@ def get_metric_scores(
     get_size_dl("Retain Valid Dl (original): ", retain_valid_dl_original)
     get_size_dl("Forget Valid Dl (original): ", forget_valid_dl_original)
 
-    # FIXED: Use *_original loaders (no augmentation) for evaluation metrics
+    # Use *_original loaders (no augmentation) for evaluation metrics
     loss_acc_dict = evaluate(model, valid_dl, device)
-    retain_acc_dict = evaluate(model, retain_valid_dl_original, device)  # FIXED: was retain_valid_dl
-    zrf = UnLearningScore(model, unlearning_teacher, forget_valid_dl_original, 128, device)  # FIXED: was forget_valid_dl
-    d_f = evaluate(model, forget_valid_dl_original, device)  # FIXED: was forget_valid_dl
+    retain_acc_dict = evaluate(model, retain_valid_dl_original, device)
+    zrf = UnLearningScore(model, unlearning_teacher, forget_valid_dl_original, 128, device)
+    d_f = evaluate(model, forget_valid_dl_original, device)
     mia = 0
     
-    # FIXED: Use *_original loaders (no augmentation) for MIA
+    # Use *_original loaders (no augmentation) for MIA
     # Support multiple MIA attack types
     if attack_type == "xgboost":
         print(f"Running XGBoost MIA attack...")
@@ -388,10 +386,10 @@ def retrain(
                 torch.save(net.state_dict(), weights_path)
                 best_acc = acc
 
-    # Final metrics - FIXED: pass net instead of model
+    # Final metrics are computed on the retrained model
     attack_type = kwargs.get("attack_type", "standard")
     return get_metric_scores(
-        net,  # FIXED: was incorrectly passing `model` (baseline)
+        net,
         unlearning_teacher,
         train_dl,
         retain_train_dl,

@@ -140,7 +140,6 @@ def get_vals(master, exp, method, col):
     return master[(master['experiment']==exp)&(master['unlearning']==method)][col].dropna().values
 
 def save_fig(fig, name):
-    # Only PNG for now; re-enable PDF line when ready for camera-ready
     # fig.savefig(os.path.join(OUTPUT_DIR, f'{name}.pdf'), bbox_inches='tight')
     fig.savefig(os.path.join(OUTPUT_DIR, f'{name}.png'), bbox_inches='tight')
     plt.close(fig)
@@ -302,7 +301,7 @@ def fig4_effect_size(master):
     print("  ✓ Figure 4: Effect Size (Cohen's d)")
 
 # ═══════════════════════════════════════════════════════════════
-# FIGURE 5: Rank Contradictions — NOW USES MUS_i SCORES
+# FIGURE 5: Rank Contradictions (MUS_i scores)
 # FM4: Inter-Task Rank Inconsistency
 #
 # MUS_i is the per-task MIAU component: for each MIA task, MUS_i

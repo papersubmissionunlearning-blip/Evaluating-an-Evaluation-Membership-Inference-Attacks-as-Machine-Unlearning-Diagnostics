@@ -3,7 +3,10 @@ Refer to forget_full_class_... for comments
 This file is near identical with minimal modifications to facilitate subclass forgetting.
 Seperate file to allow for easy reuse.
 
-FIXED: retrain() now loads pre-existing retrain models from disk if available
+Code adapted from https://github.com/if-loops/selective-synaptic-dampening/tree/main/src
+https://arxiv.org/abs/2308.07707
+
+retrain() loads a pre-existing retrain model from disk if one is available.
 """
 
 import random
@@ -293,7 +296,7 @@ def get_metric_scores(
     forget_valid_dl,
     valid_dl,
     device,
-    # FIXED: Add original (non-augmented) loaders for evaluation
+    # Original (non-augmented) loaders for evaluation
     retain_train_dl_original=None,
     retain_valid_dl_original=None,
     forget_train_dl_original=None,
@@ -312,17 +315,17 @@ def get_metric_scores(
     get_size_dl("Retain Valid Dl (eval): ", retain_eval)
     get_size_dl("Forget Valid Dl (eval): ", forget_eval)
 
-    # FIXED: Use non-augmented loaders for evaluation metrics
+    # Use non-augmented loaders for evaluation metrics
     loss_acc_dict = evaluate(model, valid_dl, device)
-    retain_acc_dict = evaluate(model, retain_eval, device)  # FIXED
-    zrf = UnLearningScore(model, unlearning_teacher, forget_eval, 128, device)  # FIXED
-    d_f = evaluate(model, forget_eval, device)  # FIXED
-    mia = get_membership_attack_prob(retain_mia, forget_mia, valid_dl, model)  # FIXED
+    retain_acc_dict = evaluate(model, retain_eval, device)
+    zrf = UnLearningScore(model, unlearning_teacher, forget_eval, 128, device)
+    d_f = evaluate(model, forget_eval, device)
+    mia = get_membership_attack_prob(retain_mia, forget_mia, valid_dl, model)
     
-    # FIXED: Use non-augmented loaders for MIA
-    mia_forget_retain = get_membership_attack_prob_our(retain_mia, forget_mia, model)  # FIXED
-    mia_forget_test = get_membership_attack_prob_our(valid_dl, forget_mia, model)  # FIXED
-    mia_retain_test = get_membership_attack_prob_our(retain_mia, valid_dl, model)  # FIXED
+    # Use non-augmented loaders for MIA
+    mia_forget_retain = get_membership_attack_prob_our(retain_mia, forget_mia, model)
+    mia_forget_test = get_membership_attack_prob_our(valid_dl, forget_mia, model)
+    mia_retain_test = get_membership_attack_prob_our(retain_mia, valid_dl, model)
     mia_train_test = get_membership_attack_prob_our(valid_dl, train_dl, model)
 
     return (loss_acc_dict["Acc"], retain_acc_dict["Acc"], zrf, mia, mia_forget_retain, mia_forget_test, mia_retain_test, mia_train_test, d_f["Acc"]) 
@@ -351,7 +354,7 @@ def baseline(
         forget_valid_dl,
         valid_dl,
         device,
-        # FIXED: Pass original loaders from kwargs
+        # Pass original (non-augmented) loaders from kwargs
         retain_train_dl_original=kwargs.get("retain_train_dl_original"),
         retain_valid_dl_original=kwargs.get("retain_valid_dl_original"),
         forget_train_dl_original=kwargs.get("forget_train_dl_original"),
@@ -443,7 +446,7 @@ def retrain(
             forget_valid_dl,
             valid_dl,
             device,
-            # FIXED: Pass original loaders from kwargs
+            # Pass original (non-augmented) loaders from kwargs
             retain_train_dl_original=kwargs.get("retain_train_dl_original"),
             retain_valid_dl_original=kwargs.get("retain_valid_dl_original"),
             forget_train_dl_original=kwargs.get("forget_train_dl_original"),
@@ -555,7 +558,7 @@ def retrain(
         forget_valid_dl,
         valid_dl,
         device,
-        # FIXED: Pass original loaders from kwargs
+        # Pass original (non-augmented) loaders from kwargs
         retain_train_dl_original=kwargs.get("retain_train_dl_original"),
         retain_valid_dl_original=kwargs.get("retain_valid_dl_original"),
         forget_train_dl_original=kwargs.get("forget_train_dl_original"),
@@ -590,7 +593,7 @@ def finetune(
         forget_valid_dl,
         valid_dl,
         device,
-        # FIXED: Pass original loaders from kwargs
+        # Pass original (non-augmented) loaders from kwargs
         retain_train_dl_original=kwargs.get("retain_train_dl_original"),
         retain_valid_dl_original=kwargs.get("retain_valid_dl_original"),
         forget_train_dl_original=kwargs.get("forget_train_dl_original"),
@@ -645,7 +648,7 @@ def teacher(
         forget_valid_dl,
         valid_dl,
         device,
-        # FIXED: Pass original loaders from kwargs
+        # Pass original (non-augmented) loaders from kwargs
         retain_train_dl_original=kwargs.get("retain_train_dl_original"),
         retain_valid_dl_original=kwargs.get("retain_valid_dl_original"),
         forget_train_dl_original=kwargs.get("forget_train_dl_original"),
@@ -697,7 +700,7 @@ def amnesiac(
         forget_valid_dl,
         valid_dl,
         device,
-        # FIXED: Pass original loaders from kwargs
+        # Pass original (non-augmented) loaders from kwargs
         retain_train_dl_original=kwargs.get("retain_train_dl_original"),
         retain_valid_dl_original=kwargs.get("retain_valid_dl_original"),
         forget_train_dl_original=kwargs.get("forget_train_dl_original"),
@@ -909,7 +912,7 @@ def NTK(
         forget_valid_dl,
         valid_dl,
         device,
-        # FIXED: Pass original loaders from kwargs
+        # Pass original (non-augmented) loaders from kwargs
         retain_train_dl_original=kwargs.get("retain_train_dl_original"),
         retain_valid_dl_original=kwargs.get("retain_valid_dl_original"),
         forget_train_dl_original=kwargs.get("forget_train_dl_original"),
@@ -1005,7 +1008,7 @@ def FisherForgetting(
         forget_valid_dl,
         valid_dl,
         device,
-        # FIXED: Pass original loaders from kwargs
+        # Pass original (non-augmented) loaders from kwargs
         retain_train_dl_original=kwargs.get("retain_train_dl_original"),
         retain_valid_dl_original=kwargs.get("retain_valid_dl_original"),
         forget_train_dl_original=kwargs.get("forget_train_dl_original"),
@@ -1084,7 +1087,7 @@ def UNSIR(
         forget_valid_dl,
         valid_dl,
         device,
-        # FIXED: Pass original loaders from kwargs
+        # Pass original (non-augmented) loaders from kwargs
         retain_train_dl_original=kwargs.get("retain_train_dl_original"),
         retain_valid_dl_original=kwargs.get("retain_valid_dl_original"),
         forget_train_dl_original=kwargs.get("forget_train_dl_original"),
@@ -1138,7 +1141,7 @@ def ssdtuning(
         forget_valid_dl,
         valid_dl,
         device,
-        # FIXED: Pass original loaders from kwargs
+        # Pass original (non-augmented) loaders from kwargs
         retain_train_dl_original=kwargs.get("retain_train_dl_original"),
         retain_valid_dl_original=kwargs.get("retain_valid_dl_original"),
         forget_train_dl_original=kwargs.get("forget_train_dl_original"),

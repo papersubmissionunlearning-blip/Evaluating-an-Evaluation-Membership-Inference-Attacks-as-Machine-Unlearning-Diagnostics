@@ -3,6 +3,9 @@
 """
 This file is used to collect all arguments for the experiment, prepare the dataloaders, call the method for forgetting, and gather/log the metrics.
 Methods are executed in the strategies file.
+
+Code adapted from https://github.com/if-loops/selective-synaptic-dampening/tree/main/src
+https://arxiv.org/abs/2308.07707
 """
 
 import random
@@ -188,8 +191,8 @@ forgetset = getattr(datasets, args.dataset)(
         indices=forget_train
     )
 
-# FIXED: Create evaluation sets (no augmentation) for consistent MIA and metrics
-# FIXED: identity_range ensures MUCAC loads correct identity range even with unlearning=True
+# Evaluation sets (no augmentation) for consistent MIA and metrics
+# identity_range ensures MUCAC loads the correct identity range even with unlearning=True
 retainset_eval = getattr(datasets, args.dataset)(
         root=root,
         download=True,
@@ -197,7 +200,7 @@ retainset_eval = getattr(datasets, args.dataset)(
         unlearning=True,  # unlearning=True means no augmentation
         img_size=img_size,
         indices=retain_train,
-        identity_range="retain"  # FIXED: Force retain identities for MUCAC
+        identity_range="retain"  # Force retain identities for MUCAC
     )
 forgetset_eval = getattr(datasets, args.dataset)(
         root=root,
@@ -206,13 +209,13 @@ forgetset_eval = getattr(datasets, args.dataset)(
         unlearning=True,  # unlearning=True means no augmentation
         img_size=img_size,
         indices=forget_train,
-        identity_range="forget"  # FIXED: Force forget identities for MUCAC
+        identity_range="forget"  # Force forget identities for MUCAC
     )
 
 forget_train_dl = DataLoader(forgetset, batch_size)
 retain_train_dl = DataLoader(retainset, batch_size, shuffle=True)
 
-# FIXED: Create original (non-augmented) loaders for MIA evaluation
+# Original (non-augmented) loaders for MIA evaluation
 forget_train_dl_original = DataLoader(forgetset_eval, batch_size)
 retain_train_dl_original = DataLoader(retainset_eval, batch_size, shuffle=True)
 
@@ -227,7 +230,7 @@ full_train_dl = DataLoader(
 forget_valid_dl = forget_train_dl   #DataLoader(forget_valid, batch_size)
 retain_valid_dl = retain_train_dl  #DataLoader(retain_valid, batch_size)
 
-# FIXED: Create original (non-augmented) loaders for evaluation
+# Original (non-augmented) loaders for evaluation
 forget_valid_dl_original = forget_train_dl_original
 retain_valid_dl_original = retain_train_dl_original
 
@@ -252,7 +255,7 @@ kwargs = {
         "forget_valid_dl": forget_valid_dl,
         "full_train_dl": full_train_dl,
         "valid_dl": validloader,
-        # FIXED: Add original (non-augmented) loaders for evaluation
+        # Original (non-augmented) loaders for evaluation
         "retain_train_dl_original": retain_train_dl_original,
         "retain_valid_dl_original": retain_valid_dl_original,
         "forget_train_dl_original": forget_train_dl_original,
