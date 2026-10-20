@@ -1,0 +1,256 @@
+Logging training to: /content/drive/MyDrive/DeepUnlearning/Unlearning/source_submitted/checkpoint/underfitted/ResNet18-Cifar10-Underfitted-best.txt
+Train set size: 50000 samples
+Test set size: 10000 samples
+Training Epoch: 1 [256/50000]	Loss: 2.4478	LR: 0.000000
+Training Epoch: 1 [512/50000]	Loss: 2.4544	LR: 0.000510
+Training Epoch: 1 [768/50000]	Loss: 2.4197	LR: 0.001020
+Training Epoch: 1 [1024/50000]	Loss: 2.3973	LR: 0.001531
+Training Epoch: 1 [1280/50000]	Loss: 2.3645	LR: 0.002041
+Training Epoch: 1 [1536/50000]	Loss: 2.2511	LR: 0.002551
+Training Epoch: 1 [1792/50000]	Loss: 2.2455	LR: 0.003061
+Training Epoch: 1 [2048/50000]	Loss: 2.2323	LR: 0.003571
+Training Epoch: 1 [2304/50000]	Loss: 2.2623	LR: 0.004082
+Training Epoch: 1 [2560/50000]	Loss: 2.2126	LR: 0.004592
+Training Epoch: 1 [2816/50000]	Loss: 2.2369	LR: 0.005102
+Training Epoch: 1 [3072/50000]	Loss: 2.2774	LR: 0.005612
+Training Epoch: 1 [3328/50000]	Loss: 2.2714	LR: 0.006122
+Training Epoch: 1 [3584/50000]	Loss: 2.1521	LR: 0.006633
+Training Epoch: 1 [3840/50000]	Loss: 2.0712	LR: 0.007143
+Training Epoch: 1 [4096/50000]	Loss: 2.1304	LR: 0.007653
+Training Epoch: 1 [4352/50000]	Loss: 2.0920	LR: 0.008163
+Training Epoch: 1 [4608/50000]	Loss: 1.9992	LR: 0.008673
+Training Epoch: 1 [4864/50000]	Loss: 1.9475	LR: 0.009184
+Training Epoch: 1 [5120/50000]	Loss: 1.8846	LR: 0.009694
+Training Epoch: 1 [5376/50000]	Loss: 1.9885	LR: 0.010204
+Training Epoch: 1 [5632/50000]	Loss: 1.8502	LR: 0.010714
+Training Epoch: 1 [5888/50000]	Loss: 1.8771	LR: 0.011224
+Training Epoch: 1 [6144/50000]	Loss: 1.9028	LR: 0.011735
+Training Epoch: 1 [6400/50000]	Loss: 1.9604	LR: 0.012245
+Training Epoch: 1 [6656/50000]	Loss: 1.8186	LR: 0.012755
+Training Epoch: 1 [6912/50000]	Loss: 1.8229	LR: 0.013265
+Training Epoch: 1 [7168/50000]	Loss: 1.8839	LR: 0.013776
+Training Epoch: 1 [7424/50000]	Loss: 1.9002	LR: 0.014286
+Training Epoch: 1 [7680/50000]	Loss: 1.7585	LR: 0.014796
+Training Epoch: 1 [7936/50000]	Loss: 1.9835	LR: 0.015306
+Training Epoch: 1 [8192/50000]	Loss: 1.9478	LR: 0.015816
+Training Epoch: 1 [8448/50000]	Loss: 2.0179	LR: 0.016327
+Training Epoch: 1 [8704/50000]	Loss: 1.8206	LR: 0.016837
+Training Epoch: 1 [8960/50000]	Loss: 1.8818	LR: 0.017347
+Training Epoch: 1 [9216/50000]	Loss: 1.8776	LR: 0.017857
+Training Epoch: 1 [9472/50000]	Loss: 1.7216	LR: 0.018367
+Training Epoch: 1 [9728/50000]	Loss: 1.8170	LR: 0.018878
+Training Epoch: 1 [9984/50000]	Loss: 1.7517	LR: 0.019388
+Training Epoch: 1 [10240/50000]	Loss: 1.9341	LR: 0.019898
+Training Epoch: 1 [10496/50000]	Loss: 1.7391	LR: 0.020408
+Training Epoch: 1 [10752/50000]	Loss: 1.8038	LR: 0.020918
+Training Epoch: 1 [11008/50000]	Loss: 1.7657	LR: 0.021429
+Training Epoch: 1 [11264/50000]	Loss: 1.7359	LR: 0.021939
+Training Epoch: 1 [11520/50000]	Loss: 1.6863	LR: 0.022449
+Training Epoch: 1 [11776/50000]	Loss: 1.9206	LR: 0.022959
+Training Epoch: 1 [12032/50000]	Loss: 1.6871	LR: 0.023469
+Training Epoch: 1 [12288/50000]	Loss: 1.6099	LR: 0.023980
+Training Epoch: 1 [12544/50000]	Loss: 1.7921	LR: 0.024490
+Training Epoch: 1 [12800/50000]	Loss: 1.5876	LR: 0.025000
+Training Epoch: 1 [13056/50000]	Loss: 1.8244	LR: 0.025510
+Training Epoch: 1 [13312/50000]	Loss: 1.8584	LR: 0.026020
+Training Epoch: 1 [13568/50000]	Loss: 1.7500	LR: 0.026531
+Training Epoch: 1 [13824/50000]	Loss: 1.8657	LR: 0.027041
+Training Epoch: 1 [14080/50000]	Loss: 1.8380	LR: 0.027551
+Training Epoch: 1 [14336/50000]	Loss: 1.7433	LR: 0.028061
+Training Epoch: 1 [14592/50000]	Loss: 1.7436	LR: 0.028571
+Training Epoch: 1 [14848/50000]	Loss: 1.6952	LR: 0.029082
+Training Epoch: 1 [15104/50000]	Loss: 1.7596	LR: 0.029592
+Training Epoch: 1 [15360/50000]	Loss: 1.7678	LR: 0.030102
+Training Epoch: 1 [15616/50000]	Loss: 1.7871	LR: 0.030612
+Training Epoch: 1 [15872/50000]	Loss: 1.7643	LR: 0.031122
+Training Epoch: 1 [16128/50000]	Loss: 1.7851	LR: 0.031633
+Training Epoch: 1 [16384/50000]	Loss: 1.7653	LR: 0.032143
+Training Epoch: 1 [16640/50000]	Loss: 1.7928	LR: 0.032653
+Training Epoch: 1 [16896/50000]	Loss: 1.5699	LR: 0.033163
+Training Epoch: 1 [17152/50000]	Loss: 1.7108	LR: 0.033673
+Training Epoch: 1 [17408/50000]	Loss: 1.7057	LR: 0.034184
+Training Epoch: 1 [17664/50000]	Loss: 1.7981	LR: 0.034694
+Training Epoch: 1 [17920/50000]	Loss: 1.6716	LR: 0.035204
+Training Epoch: 1 [18176/50000]	Loss: 1.7820	LR: 0.035714
+Training Epoch: 1 [18432/50000]	Loss: 1.8729	LR: 0.036224
+Training Epoch: 1 [18688/50000]	Loss: 1.7035	LR: 0.036735
+Training Epoch: 1 [18944/50000]	Loss: 1.6813	LR: 0.037245
+Training Epoch: 1 [19200/50000]	Loss: 1.7141	LR: 0.037755
+Training Epoch: 1 [19456/50000]	Loss: 1.9874	LR: 0.038265
+Training Epoch: 1 [19712/50000]	Loss: 1.6779	LR: 0.038776
+Training Epoch: 1 [19968/50000]	Loss: 1.7286	LR: 0.039286
+Training Epoch: 1 [20224/50000]	Loss: 1.6642	LR: 0.039796
+Training Epoch: 1 [20480/50000]	Loss: 1.7263	LR: 0.040306
+Training Epoch: 1 [20736/50000]	Loss: 1.8282	LR: 0.040816
+Training Epoch: 1 [20992/50000]	Loss: 1.7109	LR: 0.041327
+Training Epoch: 1 [21248/50000]	Loss: 1.8668	LR: 0.041837
+Training Epoch: 1 [21504/50000]	Loss: 1.6995	LR: 0.042347
+Training Epoch: 1 [21760/50000]	Loss: 1.8673	LR: 0.042857
+Training Epoch: 1 [22016/50000]	Loss: 1.6705	LR: 0.043367
+Training Epoch: 1 [22272/50000]	Loss: 1.7474	LR: 0.043878
+Training Epoch: 1 [22528/50000]	Loss: 1.8148	LR: 0.044388
+Training Epoch: 1 [22784/50000]	Loss: 1.5994	LR: 0.044898
+Training Epoch: 1 [23040/50000]	Loss: 1.7109	LR: 0.045408
+Training Epoch: 1 [23296/50000]	Loss: 1.7644	LR: 0.045918
+Training Epoch: 1 [23552/50000]	Loss: 1.6752	LR: 0.046429
+Training Epoch: 1 [23808/50000]	Loss: 1.5159	LR: 0.046939
+Training Epoch: 1 [24064/50000]	Loss: 1.6629	LR: 0.047449
+Training Epoch: 1 [24320/50000]	Loss: 1.6808	LR: 0.047959
+Training Epoch: 1 [24576/50000]	Loss: 1.4431	LR: 0.048469
+Training Epoch: 1 [24832/50000]	Loss: 1.6837	LR: 0.048980
+Training Epoch: 1 [25088/50000]	Loss: 1.6344	LR: 0.049490
+Training Epoch: 1 [25344/50000]	Loss: 1.6360	LR: 0.050000
+Training Epoch: 1 [25600/50000]	Loss: 1.5007	LR: 0.050510
+Training Epoch: 1 [25856/50000]	Loss: 1.7814	LR: 0.051020
+Training Epoch: 1 [26112/50000]	Loss: 1.6355	LR: 0.051531
+Training Epoch: 1 [26368/50000]	Loss: 1.7119	LR: 0.052041
+Training Epoch: 1 [26624/50000]	Loss: 1.6955	LR: 0.052551
+Training Epoch: 1 [26880/50000]	Loss: 1.5810	LR: 0.053061
+Training Epoch: 1 [27136/50000]	Loss: 1.7085	LR: 0.053571
+Training Epoch: 1 [27392/50000]	Loss: 1.6810	LR: 0.054082
+Training Epoch: 1 [27648/50000]	Loss: 1.5613	LR: 0.054592
+Training Epoch: 1 [27904/50000]	Loss: 1.6940	LR: 0.055102
+Training Epoch: 1 [28160/50000]	Loss: 1.5889	LR: 0.055612
+Training Epoch: 1 [28416/50000]	Loss: 1.5877	LR: 0.056122
+Training Epoch: 1 [28672/50000]	Loss: 1.6885	LR: 0.056633
+Training Epoch: 1 [28928/50000]	Loss: 1.8019	LR: 0.057143
+Training Epoch: 1 [29184/50000]	Loss: 1.4921	LR: 0.057653
+Training Epoch: 1 [29440/50000]	Loss: 1.4163	LR: 0.058163
+Training Epoch: 1 [29696/50000]	Loss: 1.5985	LR: 0.058673
+Training Epoch: 1 [29952/50000]	Loss: 1.6545	LR: 0.059184
+Training Epoch: 1 [30208/50000]	Loss: 1.5862	LR: 0.059694
+Training Epoch: 1 [30464/50000]	Loss: 1.8032	LR: 0.060204
+Training Epoch: 1 [30720/50000]	Loss: 1.5202	LR: 0.060714
+Training Epoch: 1 [30976/50000]	Loss: 1.6693	LR: 0.061224
+Training Epoch: 1 [31232/50000]	Loss: 1.6338	LR: 0.061735
+Training Epoch: 1 [31488/50000]	Loss: 1.8732	LR: 0.062245
+Training Epoch: 1 [31744/50000]	Loss: 1.5178	LR: 0.062755
+Training Epoch: 1 [32000/50000]	Loss: 1.6394	LR: 0.063265
+Training Epoch: 1 [32256/50000]	Loss: 1.8876	LR: 0.063776
+Training Epoch: 1 [32512/50000]	Loss: 1.9251	LR: 0.064286
+Training Epoch: 1 [32768/50000]	Loss: 1.6630	LR: 0.064796
+Training Epoch: 1 [33024/50000]	Loss: 1.8538	LR: 0.065306
+Training Epoch: 1 [33280/50000]	Loss: 1.7008	LR: 0.065816
+Training Epoch: 1 [33536/50000]	Loss: 1.7057	LR: 0.066327
+Training Epoch: 1 [33792/50000]	Loss: 1.6914	LR: 0.066837
+Training Epoch: 1 [34048/50000]	Loss: 1.7176	LR: 0.067347
+Training Epoch: 1 [34304/50000]	Loss: 1.4489	LR: 0.067857
+Training Epoch: 1 [34560/50000]	Loss: 1.6568	LR: 0.068367
+Training Epoch: 1 [34816/50000]	Loss: 1.5033	LR: 0.068878
+Training Epoch: 1 [35072/50000]	Loss: 1.5726	LR: 0.069388
+Training Epoch: 1 [35328/50000]	Loss: 1.4876	LR: 0.069898
+Training Epoch: 1 [35584/50000]	Loss: 1.5665	LR: 0.070408
+Training Epoch: 1 [35840/50000]	Loss: 1.5508	LR: 0.070918
+Training Epoch: 1 [36096/50000]	Loss: 1.4287	LR: 0.071429
+Training Epoch: 1 [36352/50000]	Loss: 1.5447	LR: 0.071939
+Training Epoch: 1 [36608/50000]	Loss: 1.4127	LR: 0.072449
+Training Epoch: 1 [36864/50000]	Loss: 1.5758	LR: 0.072959
+Training Epoch: 1 [37120/50000]	Loss: 1.4552	LR: 0.073469
+Training Epoch: 1 [37376/50000]	Loss: 1.4002	LR: 0.073980
+Training Epoch: 1 [37632/50000]	Loss: 1.3945	LR: 0.074490
+Training Epoch: 1 [37888/50000]	Loss: 1.4129	LR: 0.075000
+Training Epoch: 1 [38144/50000]	Loss: 1.4137	LR: 0.075510
+Training Epoch: 1 [38400/50000]	Loss: 1.5201	LR: 0.076020
+Training Epoch: 1 [38656/50000]	Loss: 1.3936	LR: 0.076531
+Training Epoch: 1 [38912/50000]	Loss: 1.4720	LR: 0.077041
+Training Epoch: 1 [39168/50000]	Loss: 1.7245	LR: 0.077551
+Training Epoch: 1 [39424/50000]	Loss: 1.7420	LR: 0.078061
+Training Epoch: 1 [39680/50000]	Loss: 1.6346	LR: 0.078571
+Training Epoch: 1 [39936/50000]	Loss: 1.6020	LR: 0.079082
+Training Epoch: 1 [40192/50000]	Loss: 1.5687	LR: 0.079592
+Training Epoch: 1 [40448/50000]	Loss: 1.6605	LR: 0.080102
+Training Epoch: 1 [40704/50000]	Loss: 1.6358	LR: 0.080612
+Training Epoch: 1 [40960/50000]	Loss: 1.6174	LR: 0.081122
+Training Epoch: 1 [41216/50000]	Loss: 1.5866	LR: 0.081633
+Training Epoch: 1 [41472/50000]	Loss: 1.5539	LR: 0.082143
+Training Epoch: 1 [41728/50000]	Loss: 1.6749	LR: 0.082653
+Training Epoch: 1 [41984/50000]	Loss: 1.7179	LR: 0.083163
+Training Epoch: 1 [42240/50000]	Loss: 1.5202	LR: 0.083673
+Training Epoch: 1 [42496/50000]	Loss: 1.5885	LR: 0.084184
+Training Epoch: 1 [42752/50000]	Loss: 1.5894	LR: 0.084694
+Training Epoch: 1 [43008/50000]	Loss: 1.5199	LR: 0.085204
+Training Epoch: 1 [43264/50000]	Loss: 1.6897	LR: 0.085714
+Training Epoch: 1 [43520/50000]	Loss: 1.5991	LR: 0.086224
+Training Epoch: 1 [43776/50000]	Loss: 1.5972	LR: 0.086735
+Training Epoch: 1 [44032/50000]	Loss: 1.7244	LR: 0.087245
+Training Epoch: 1 [44288/50000]	Loss: 1.6100	LR: 0.087755
+Training Epoch: 1 [44544/50000]	Loss: 1.5431	LR: 0.088265
+Training Epoch: 1 [44800/50000]	Loss: 1.6558	LR: 0.088776
+Training Epoch: 1 [45056/50000]	Loss: 1.5021	LR: 0.089286
+Training Epoch: 1 [45312/50000]	Loss: 1.5772	LR: 0.089796
+Training Epoch: 1 [45568/50000]	Loss: 1.5954	LR: 0.090306
+Training Epoch: 1 [45824/50000]	Loss: 1.4815	LR: 0.090816
+Training Epoch: 1 [46080/50000]	Loss: 1.4782	LR: 0.091327
+Training Epoch: 1 [46336/50000]	Loss: 1.4387	LR: 0.091837
+Training Epoch: 1 [46592/50000]	Loss: 1.4836	LR: 0.092347
+Training Epoch: 1 [46848/50000]	Loss: 1.3770	LR: 0.092857
+Training Epoch: 1 [47104/50000]	Loss: 1.4768	LR: 0.093367
+Training Epoch: 1 [47360/50000]	Loss: 1.4187	LR: 0.093878
+Training Epoch: 1 [47616/50000]	Loss: 1.4070	LR: 0.094388
+Training Epoch: 1 [47872/50000]	Loss: 1.4645	LR: 0.094898
+Training Epoch: 1 [48128/50000]	Loss: 1.2959	LR: 0.095408
+Training Epoch: 1 [48384/50000]	Loss: 1.4733	LR: 0.095918
+Training Epoch: 1 [48640/50000]	Loss: 1.6383	LR: 0.096429
+Training Epoch: 1 [48896/50000]	Loss: 1.4127	LR: 0.096939
+Training Epoch: 1 [49152/50000]	Loss: 1.7028	LR: 0.097449
+Training Epoch: 1 [49408/50000]	Loss: 1.3375	LR: 0.097959
+Training Epoch: 1 [49664/50000]	Loss: 1.3918	LR: 0.098469
+Training Epoch: 1 [49920/50000]	Loss: 1.4303	LR: 0.098980
+Training Epoch: 1 [50000/50000]	Loss: 1.3949	LR: 0.099490
+Epoch 1 - Average Train Loss: 1.7218, Train Accuracy: 0.3693
+epoch 1 training time consumed: 33.58s
+GPU INFO.....
+|===========================================================================|
+|                  PyTorch CUDA memory summary, device ID 0                 |
+|---------------------------------------------------------------------------|
+|            CUDA OOMs: 0            |        cudaMalloc retries: 0         |
+|===========================================================================|
+|        Metric         | Cur Usage  | Peak Usage | Tot Alloc  | Tot Freed  |
+|---------------------------------------------------------------------------|
+| Allocated memory      | 150400 KiB |   1293 MiB |   1357 GiB |   1356 GiB |
+|       from large pool | 139136 KiB |   1285 MiB |   1355 GiB |   1355 GiB |
+|       from small pool |  11264 KiB |     15 MiB |      1 GiB |      1 GiB |
+|---------------------------------------------------------------------------|
+| Active memory         | 150400 KiB |   1293 MiB |   1357 GiB |   1356 GiB |
+|       from large pool | 139136 KiB |   1285 MiB |   1355 GiB |   1355 GiB |
+|       from small pool |  11264 KiB |     15 MiB |      1 GiB |      1 GiB |
+|---------------------------------------------------------------------------|
+| Requested memory      | 148839 KiB |   1292 MiB |   1354 GiB |   1354 GiB |
+|       from large pool | 137600 KiB |   1284 MiB |   1353 GiB |   1352 GiB |
+|       from small pool |  11239 KiB |     14 MiB |      1 GiB |      1 GiB |
+|---------------------------------------------------------------------------|
+| GPU reserved memory   |   2146 MiB |   2146 MiB |   2146 MiB |      0 B   |
+|       from large pool |   2128 MiB |   2128 MiB |   2128 MiB |      0 B   |
+|       from small pool |     18 MiB |     18 MiB |     18 MiB |      0 B   |
+|---------------------------------------------------------------------------|
+| Non-releasable memory | 124032 KiB | 211323 KiB | 391600 MiB | 391478 MiB |
+|       from large pool | 120960 KiB | 205312 KiB | 389867 MiB | 389749 MiB |
+|       from small pool |   3072 KiB |   7365 KiB |   1732 MiB |   1729 MiB |
+|---------------------------------------------------------------------------|
+| Allocations           |     256    |     316    |   70615    |   70359    |
+|       from large pool |      26    |      59    |   37559    |   37533    |
+|       from small pool |     230    |     282    |   33056    |   32826    |
+|---------------------------------------------------------------------------|
+| Active allocs         |     256    |     316    |   70615    |   70359    |
+|       from large pool |      26    |      59    |   37559    |   37533    |
+|       from small pool |     230    |     282    |   33056    |   32826    |
+|---------------------------------------------------------------------------|
+| GPU reserved segments |      47    |      47    |      47    |       0    |
+|       from large pool |      38    |      38    |      38    |       0    |
+|       from small pool |       9    |       9    |       9    |       0    |
+|---------------------------------------------------------------------------|
+| Non-releasable allocs |      21    |      35    |   29714    |   29693    |
+|       from large pool |      10    |      20    |   20980    |   20970    |
+|       from small pool |      11    |      17    |    8734    |    8723    |
+|---------------------------------------------------------------------------|
+| Oversize allocations  |       0    |       0    |       0    |       0    |
+|---------------------------------------------------------------------------|
+| Oversize GPU segments |       0    |       0    |       0    |       0    |
+|===========================================================================|
+Evaluating Network.....
+Test set: Epoch: 1, Average loss: 0.0067, Accuracy: 0.4533, Time consumed:3.11s
+
+saving weights file to /content/drive/MyDrive/DeepUnlearning/Unlearning/source_submitted/checkpoint/underfitted/ResNet18-Cifar10-Underfitted-best.pth
+============================================================
+Training complete. Best accuracy: 0.4533
+============================================================

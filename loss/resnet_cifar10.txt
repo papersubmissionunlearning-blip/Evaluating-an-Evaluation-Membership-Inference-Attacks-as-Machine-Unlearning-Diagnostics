@@ -1,0 +1,84 @@
+Epoch 1 - Average Train Loss: 1.6840, Train Accuracy: 0.3854
+
+Test set: Epoch: 1, Average loss: 0.0065, Accuracy: 0.4620, Time consumed:3.49s
+
+Epoch 2 - Average Train Loss: 1.2183, Train Accuracy: 0.5648
+
+Test set: Epoch: 2, Average loss: 0.0049, Accuracy: 0.5816, Time consumed:3.42s
+
+Epoch 3 - Average Train Loss: 0.9554, Train Accuracy: 0.6648
+
+Test set: Epoch: 3, Average loss: 0.0043, Accuracy: 0.6264, Time consumed:3.46s
+
+Epoch 4 - Average Train Loss: 0.7991, Train Accuracy: 0.7187
+
+Test set: Epoch: 4, Average loss: 0.0034, Accuracy: 0.7196, Time consumed:3.46s
+
+Epoch 5 - Average Train Loss: 0.7041, Train Accuracy: 0.7531
+
+Test set: Epoch: 5, Average loss: 0.0027, Accuracy: 0.7609, Time consumed:3.45s
+
+
+Epoch 6 - Average Train Loss: 0.6340, Train Accuracy: 0.7800
+
+Test set: Epoch: 6, Average loss: 0.0031, Accuracy: 0.7350, Time consumed:3.45s
+
+Epoch 7 - Average Train Loss: 0.5872, Train Accuracy: 0.7962
+
+Test set: Epoch: 7, Average loss: 0.0029, Accuracy: 0.7515, Time consumed:3.45s
+
+Epoch 8 - Average Train Loss: 0.4327, Train Accuracy: 0.8514
+
+Test set: Epoch: 8, Average loss: 0.0016, Accuracy: 0.8605, Time consumed:3.45s
+
+Epoch 9 - Average Train Loss: 0.3852, Train Accuracy: 0.8652
+
+Test set: Epoch: 9, Average loss: 0.0016, Accuracy: 0.8680, Time consumed:3.46s
+
+Epoch 10 - Average Train Loss: 0.3664, Train Accuracy: 0.8718
+
+Test set: Epoch: 10, Average loss: 0.0015, Accuracy: 0.8695, Time consumed:3.51s
+
+Epoch 11 - Average Train Loss: 0.3501, Train Accuracy: 0.8786
+
+Test set: Epoch: 11, Average loss: 0.0014, Accuracy: 0.8767, Time consumed:3.45s
+
+Epoch 12 - Average Train Loss: 0.3033, Train Accuracy: 0.8945
+
+Test set: Epoch: 12, Average loss: 0.0013, Accuracy: 0.8896, Time consumed:3.50s
+
+Epoch 13 - Average Train Loss: 0.2854, Train Accuracy: 0.9005
+
+Test set: Epoch: 13, Average loss: 0.0013, Accuracy: 0.8888, Time consumed:3.47s
+
+Epoch 14 - Average Train Loss: 0.2790, Train Accuracy: 0.9022
+
+Test set: Epoch: 14, Average loss: 0.0013, Accuracy: 0.8896, Time consumed:3.44s
+
+Epoch 15 - Average Train Loss: 0.2741, Train Accuracy: 0.9045
+
+Test set: Epoch: 15, Average loss: 0.0013, Accuracy: 0.8940, Time consumed:3.47s
+
+
+Epoch 16 - Average Train Loss: 0.2562, Train Accuracy: 0.9102
+
+Test set: Epoch: 16, Average loss: 0.0012, Accuracy: 0.8946, Time consumed:3.48s
+
+Epoch 17 - Average Train Loss: 0.2573, Train Accuracy: 0.9106
+
+Test set: Epoch: 17, Average loss: 0.0012, Accuracy: 0.8960, Time consumed:3.45s
+
+
+Epoch 18 - Average Train Loss: 0.2562, Train Accuracy: 0.9108
+
+Test set: Epoch: 18, Average loss: 0.0012, Accuracy: 0.8943, Time consumed:3.47s
+
+Epoch 19 - Average Train Loss: 0.2561, Train Accuracy: 0.9094
+
+Test set: Epoch: 19, Average loss: 0.0012, Accuracy: 0.8955, Time consumed:3.44s
+
+
+Epoch 20 - Average Train Loss: 0.2540, Train Accuracy: 0.9118
+
+Evaluating Network.....
+Test set: Epoch: 20, Average loss: 0.0012, Accuracy: 0.8952, Time consumed:3.44s
