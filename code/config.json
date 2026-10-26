@@ -2,25 +2,6 @@
     "base_path": "/content/drive/MyDrive/DeepUnlearning/Unlearning/source_submitted",
     "seeds": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
     "output_base": "Results_Fixed",
-
-    "graded_eval": {
-        "ret_percs": [25, 50, 75],
-        "folders": {
-            "ResNet18_Cifar10":             "Retrain Models/ResNet Cifar 10",
-            "ResNet18_Cifar20":             "Retrain Models/ResNet Cifar 20 _38",
-            "ResNet18_Mnist":               "Retrain Models/ResNet MNIST _4",
-            "ResNet18_MUCAC":               "Retrain Models/ResNet MUCAC _30",
-            "AllCNN_Cifar10":               "Retrain Models/AllCNN Cifar 10 _20",
-            "AllCNN_Cifar20":               "Retrain Models/AllCNN Cifar 20 _40",
-            "AllCNN_Mnist":                 "Retrain Models/AllCNN MNIST _4",
-            "ViT_Cifar10":                  "Retrain Models/ViT Cifar 10 _7",
-            "ResNet18_Cifar10_Underfitted": "Retrain Models/Underfitted Resnet Cifar10 _1",
-            "ResNet18_Cifar10_Overfitted":  "Retrain Models/Overfitted Resnet Cifar10 _10 (No transformation)",
-            "AllCNN_Cifar20_FullClass":     "Retrain Models/Full Class",
-            "AllCNN_Cifar20_SubClass":      "Retrain Models/Sub Class",
-            "ResNet18_Cifar10_AdvancedMIA": "Retrain Models/ResNet Cifar 10"
-        }
-    },
     
     "experiments": [
         {

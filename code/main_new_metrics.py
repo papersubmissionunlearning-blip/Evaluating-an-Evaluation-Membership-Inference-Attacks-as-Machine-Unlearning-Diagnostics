@@ -287,6 +287,10 @@ def main():
         num_classes=num_classes_for_split
     )
 
+    # Graded retrains train on the transferred split but are evaluated on the
+    # original one, so the whole forget set is scored at every level.
+    eval_forget_indices, eval_retain_indices = list(forget_indices), list(retain_indices)
+
     # Transfer percentage if specified
     if args.ret_perc > 0:
         forget_indices, retain_indices = transfer_percent_from_forget_to_retain(
@@ -313,17 +317,18 @@ def main():
         identity_range=mucac_identity_range
     )
 
-    # Create retain and forget sets with evaluation transforms (unlearning=True)
+    # Create retain and forget sets with evaluation transforms (unlearning=True),
+    # always on the original forget/retain split
     # MUCAC: Use "train_all" for consistent indexing with split file
     retainset_eval = getattr(datasets, args.dataset)(
         root=root, download=True, train=True, unlearning=True,
-        img_size=img_size, indices=retain_indices,
+        img_size=img_size, indices=eval_retain_indices,
         use_augmentation=use_augmentation,
         identity_range=mucac_identity_range
     )
     forgetset_eval = getattr(datasets, args.dataset)(
         root=root, download=True, train=True, unlearning=True,
-        img_size=img_size, indices=forget_indices,
+        img_size=img_size, indices=eval_forget_indices,
         use_augmentation=use_augmentation,
         identity_range=mucac_identity_range
     )

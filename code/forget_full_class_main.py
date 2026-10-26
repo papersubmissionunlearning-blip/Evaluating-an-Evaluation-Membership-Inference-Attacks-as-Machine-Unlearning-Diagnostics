@@ -172,6 +172,13 @@ classwise_train, classwise_test = forget_full_class_strategies.get_classwise_ds(
     classwise_train, classwise_test, args.classes, forget_class, args.ret_perc
 )
 
+# Graded retrains train on the transferred split but are evaluated on the
+# original one, so the whole forget set is scored at every level.
+eval_retain_train, _, eval_forget_train, _ = forget_full_class_strategies.build_retain_forget_sets(
+    classwise_train, classwise_test, args.classes, forget_class, 0
+)
+assert set(forget_train) <= set(eval_forget_train), "transferred forget set is not a subset of the original"
+
 
 # Training sets (with augmentation for training)
 retainset = getattr(datasets, args.dataset)(
@@ -191,7 +198,7 @@ forgetset = getattr(datasets, args.dataset)(
         indices=forget_train
     )
 
-# Evaluation sets (no augmentation) for consistent MIA and metrics
+# Evaluation sets (no augmentation) for consistent MIA and metrics, on the original split
 # identity_range ensures MUCAC loads the correct identity range even with unlearning=True
 retainset_eval = getattr(datasets, args.dataset)(
         root=root,
@@ -199,7 +206,7 @@ retainset_eval = getattr(datasets, args.dataset)(
         train=True,
         unlearning=True,  # unlearning=True means no augmentation
         img_size=img_size,
-        indices=retain_train,
+        indices=eval_retain_train,
         identity_range="retain"  # Force retain identities for MUCAC
     )
 forgetset_eval = getattr(datasets, args.dataset)(
@@ -208,7 +215,7 @@ forgetset_eval = getattr(datasets, args.dataset)(
         train=True,
         unlearning=True,  # unlearning=True means no augmentation
         img_size=img_size,
-        indices=forget_train,
+        indices=eval_forget_train,
         identity_range="forget"  # Force forget identities for MUCAC
     )
 
